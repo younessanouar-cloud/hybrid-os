@@ -1,0 +1,12 @@
+{
+    "KPlugin": {
+        "Authors": [ { "Name": "HYBRID OS Project" } ],
+        "Description": "Minimal OPALE look-and-feel for HYBRID OS (Alpha 0.1 : fond d'ecran + palette ; thames complets en Phase 2)",
+        "Id": "com.hybridos.opale",
+        "License": "CC-BY-SA-4.0",
+        "Name": "HYBRID Opale",
+        "ServiceTypes": [ "Plasma/LookAndFeelPackage" ],
+        "Version": "0.1.0",
+        "Website": "https://github.com/younessanouar-cloud/hybrid-os"
+    }
+}
