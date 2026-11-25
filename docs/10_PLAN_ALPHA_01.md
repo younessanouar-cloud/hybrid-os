@@ -31,9 +31,9 @@
 
 | # | Étape | Produit | Validation |
 |---|---|---|---|
-| 1 | Initialiser le dépôt technique (structure cahier des charges §10 : build/, system/, desktop/… + CI vierge) | Dépôt + workflow CI qui build l'image de base sans modification | CI verte |
-| 2 | Manifeste des versions (base figée) + `Containerfile` HYBRID v0 | Image OCI `hybridos/base` | `bootc status` OK en conteneur CI |
-| 3 | Couche KDE + branding OPALE v0 (fond, couleurs, KSplash, paquets de base FR) | Image `hybridos/desktop` | Build CI vert + tests headless d'apps |
+| 1 | Initialiser le dépôt technique (structure cahier des charges §10 : build/, system/, desktop/… + CI vierge) | Dépôt + workflow CI qui build l'image de base sans modification | ✅ **VALIDÉE** — run 45709596687 (25/11/2026) : base ET desktop verts |
+| 2 | Manifeste des versions (base figée) + `Containerfile` HYBRID v0 | Image OCI `hybridos/base` | ✅ **VALIDÉE** — bootc 1.17.1 opérationnel en conteneur CI |
+| 3 | Couche KDE + branding OPALE v0 (fond, couleurs, KSplash simple, paquets de base FR) | Image `hybridos/desktop` | ✅ **VALIDÉE** — Plasma 6.8.3, locale FR, branding OPALE 4/4 fichiers PRÉSENTS (rapport artefact) |
 | 4 | Signature cosign (clé de test, hors dépôt) + publication registre GHCR | Image signée | Vérification `cosign verify` en CI |
 | 5 | Génération ISO via `bootc-image-builder` (`anaconda-iso`) + artefact CI téléchargeable | ISO Alpha 0.1 | Artefact présent + hash SHA256 publié |
 | 6 | Test VM documenté (local : smoke ; CI : scripts sériels) : boot → install → reboot | Rapport de test n°1 (commandes + sorties) | Tous les critères §7 du doc 09 |

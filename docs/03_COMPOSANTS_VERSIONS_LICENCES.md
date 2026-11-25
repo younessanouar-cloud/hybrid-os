@@ -9,9 +9,9 @@
 
 | Composant | Version courante constatée (nov. 2026) | Licence | Statut |
 |---|---|---|---|
-| Fedora (base Atomic) | Fedora 43 stable ; **Fedora 44** en cours de généralisation (les dérivées majeures sont déjà basées F44, constaté juil. 2026) | Licences Fedora (GPL, MIT,…) | ⚠️ figer au build |
+| Fedora (base Atomic) | **Fedora 45** — tag stable courant de `quay.io/fedora/fedora-kinoite`, figé par digest le 25/11/2026 (API quay) ; versions constatées dans notre image (rapport CI) : kernel 7.3.4-300.fc45, Plasma 6.8.3, bootc 1.17.1, SELinux policy 45.24 | Licences Fedora (GPL, MIT,…) | ✅ figée + vérifiée |
 | Image de base OCI | `quay.io/fedora/fedora-bootc` (officielle, KDE en variante desktop) ou image Kinoite selon disponibilité exacte au build | idem | ⚠️ choisir + figer digest |
-| Noyau Linux | ≥ 6.17 (constaté Fedora 43) ; suivra la base | GPLv2 | ✅ hérité base |
+| Noyau Linux | **7.3.4-300.fc45** constaté (rapport CI 25/11/2026) | GPLv2 | ✅ vérifié |
 | bootc | outil de déploiement d'images OCI bootables (amont Fedora, « Image Mode Phase 2 ») | Apache-2.0/MIT | ✅ |
 | bootc-image-builder | génération qcow2/raw/**anaconda-iso** (projet osbuild) | GPL | ✅ |
 | rpm-ostree | historique ; encore présent pour le layering exceptionnel (ex. NVIDIA) | GPLv2+ | ✅ transitoire |
@@ -21,7 +21,7 @@
 
 | Composant | Version | Licence | Rôle |
 |---|---|---|---|
-| KDE Plasma | 6.6 constaté dans Fedora 43 (fév. 2026) ; F44 ≈ 6.7+ | GPLv2+ (GPL/LGPL mix) | Bureau cible |
+| KDE Plasma | **6.8.3** constaté (rapport CI 25/11/2026, fc45) | GPLv2+ (GPL/LGPL mix) | Bureau cible ✅ |
 | KF6 / Kirigami | Frameworks 6.23 constatés (F43) | LGPL/GPL | Applications natives OPALE |
 | KWin / Wayland | intégré Plasma 6 | GPLv2+ | Gestionnaire de fenêtres ; XWayland pour la compat. |
 | PipeWire | chaîne Fedora | MIT/LGPL | Audio/vidéo |

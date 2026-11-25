@@ -23,15 +23,15 @@
 
 | ID | Date | Décision | Motif principal | Statut |
 |---|---|---|---|---|
-| ADR-001 | 2026-11-25 | Base = image OCI bootable Fedora Atomic (voie `bootc`), dérivée KDE, **pas de noyau maison** | Voie officiellement soutenue par Fedora (Image Mode Phase 2, 2026), prouvée par des distributions dérivées existantes | Proposée |
-| ADR-002 | 2026-11-25 | Construction d'image **100 % en CI (GitHub Actions)**, pas en local | Machine de développement locale insuffisante (8 Go RAM, CPU faible) ; runners publics gratuits suffisants | Proposée |
-| ADR-003 | 2026-11-25 | Bureau = KDE Plasma 6 sous Wayland, personnalisé via design system **OPALE** | Puissant, scriptable (QML), Wayland natif ; évite de réécrire un DE complet | Proposée |
-| ADR-004 | 2026-11-25 | Amorceur v1 = **GRUB2** (chaîne Secure Boot Fedora conservée) ; UKI + systemd-boot = cible v2 | GRUB seul chemin éprouvé aujourd'hui pour Secure Boot + dual boot Windows sur Atomic ; UKI encore en phase test amont (suivi bootc #806) | Proposée |
-| ADR-005 | 2026-11-25 | Installateur v1 = **Anaconda** (ISO type `anaconda-iso` via bootc-image-builder) + branding HYBRID ; installateur graphique custom = Phase 5 | Anaconda est le seul installateur prouvé pour images Atomic (utilisé par Fedora Kinoite et les dérivées majeures) ; Calamares non adapté à bootc à ce jour | Proposée |
-| ADR-006 | 2026-11-25 | Applications = **Flatpak prioritaire** (Flathub vérifié) ; Wine/Proton via conteneurs/Flatpak | Isolation, provenance signée, mises à jour découplées du système | Proposée |
-| ADR-007 | 2026-11-25 | **Le design system s'appelle OPALE** (remplace « Aurora ») | « Aurora » est déjà une distribution réelle basée sur la même stack (Universal Blue) — collision de marque rédhibitoire ; OPALE : pierre hybride par nature, aucune collision OS identifiée | Proposée |
-| ADR-008 | 2026-11-25 | Mises à jour = `bootc update` (pull d'image OCI **signée cosign/Sigstore**) + rollback intégré | Modèle image-based = exigence atomique/retour arrière du cahier des charges, éprouvé | Proposée |
-| ADR-009 | 2026-11-25 | Secure Boot v1 = chaîne Fedora conservée (shim Microsoft → GRUB Fedora → noyau Fedora) ; clés propres = v2 avec enrollment assisté | Évite le processus « shim-review » (lourd) pour v1 ; l'enrollment de clés personnalisées post-install est prouvé par les distributions dérivées | Proposée |
+| ADR-001 | 2026-11-25 | Base = image OCI bootable Fedora Atomic (voie `bootc`), dérivée KDE, **pas de noyau maison** | Voie officiellement soutenue par Fedora (Image Mode Phase 2, 2026), prouvée par des distributions dérivées existantes | Validée (25/11/2026) |
+| ADR-002 | 2026-11-25 | Construction d'image **100 % en CI (GitHub Actions)**, pas en local | Machine de développement locale insuffisante (8 Go RAM, CPU faible) ; runners publics gratuits suffisants | Validée (25/11/2026) |
+| ADR-003 | 2026-11-25 | Bureau = KDE Plasma 6 sous Wayland, personnalisé via design system **OPALE** | Puissant, scriptable (QML), Wayland natif ; évite de réécrire un DE complet | Validée (25/11/2026) |
+| ADR-004 | 2026-11-25 | Amorceur v1 = **GRUB2** (chaîne Secure Boot Fedora conservée) ; UKI + systemd-boot = cible v2 | GRUB seul chemin éprouvé aujourd'hui pour Secure Boot + dual boot Windows sur Atomic ; UKI encore en phase test amont (suivi bootc #806) | Validée (25/11/2026) |
+| ADR-005 | 2026-11-25 | Installateur v1 = **Anaconda** (ISO type `anaconda-iso` via bootc-image-builder) + branding HYBRID ; installateur graphique custom = Phase 5 | Anaconda est le seul installateur prouvé pour images Atomic (utilisé par Fedora Kinoite et les dérivées majeures) ; Calamares non adapté à bootc à ce jour | Validée (25/11/2026) |
+| ADR-006 | 2026-11-25 | Applications = **Flatpak prioritaire** (Flathub vérifié) ; Wine/Proton via conteneurs/Flatpak | Isolation, provenance signée, mises à jour découplées du système | Validée (25/11/2026) |
+| ADR-007 | 2026-11-25 | **Le design system s'appelle OPALE** (remplace « Aurora ») | « Aurora » est déjà une distribution réelle basée sur la même stack (Universal Blue) — collision de marque rédhibitoire ; OPALE : pierre hybride par nature, aucune collision OS identifiée | Validée (25/11/2026) |
+| ADR-008 | 2026-11-25 | Mises à jour = `bootc update` (pull d'image OCI **signée cosign/Sigstore**) + rollback intégré | Modèle image-based = exigence atomique/retour arrière du cahier des charges, éprouvé | Validée (25/11/2026) |
+| ADR-009 | 2026-11-25 | Secure Boot v1 = chaîne Fedora conservée (shim Microsoft → GRUB Fedora → noyau Fedora) ; clés propres = v2 avec enrollment assisté | Évite le processus « shim-review » (lourd) pour v1 ; l'enrollment de clés personnalisées post-install est prouvé par les distributions dérivées | Validée (25/11/2026) |
 
 ## Ce que ce dossier n'est pas
 
