@@ -110,3 +110,140 @@ jobs:
           name: rapport-build-alpha01-${{ matrix.flavor }}
           path: tests/reports/alpha01-step3-report.txt
           retention-days: 90
+
+  # ==================================================================
+  # ÉTAPE 4 (plan Alpha 0.1, docs/10) — publication + signature
+  # L'image desktop est poussée sur GHCR puis signée en mode KEYLESS
+  # (OIDC GitHub/Sigstore) : la signature est liée au workflow et au
+  # commit qui l'ont produite — aucune clé privée à gérer en v0, la
+  # traçabilité est maximale. Les clés dédiées viendront avec la
+  # production (règle : secrets hors dépôt, doc 08 R-14).
+  # ==================================================================
+  publish-and-sign:
+    name: "Publier + signer l'image desktop (GHCR)"
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
+      id-token: write   # requis pour cosign keyless
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Lire le manifeste figé"
+        id: manifest
+        run: |
+          set -euo pipefail
+          python3 -c "import yaml" 2>/dev/null || pip3 install --quiet pyyaml
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import yaml
+          m = yaml.safe_load(open('build/manifest.yaml'))
+          b = m['base']
+          print(f"base_ref={b['registry']}/{b['repository']}@{b['digest']}")
+          print(f"image_version={m['image']['version']}")
+          EOF
+
+      - name: "Installer cosign (Sigstore)"
+        uses: sigstore/cosign-installer@v3
+
+      - name: "Connexion GHCR"
+        run: |
+          set -euo pipefail
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: "Construire et pousser l'image desktop vers GHCR"
+        id: push
+        run: |
+          set -euo pipefail
+          GHCR_IMAGE="ghcr.io/${{ github.repository_owner }}/hybridos"
+          TAG="desktop-${{ steps.manifest.outputs.image_version }}"
+          podman build \
+            --build-arg BASE_IMAGE="${{ steps.manifest.outputs.base_ref }}" \
+            -t "${GHCR_IMAGE}:${TAG}" \
+            -f build/image/Containerfile.desktop .
+          podman push "${GHCR_IMAGE}:${TAG}"
+          echo "image=${GHCR_IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: "Signer l'image (cosign keyless)"
+        run: |
+          set -euo pipefail
+          cosign sign --yes "${{ steps.push.outputs.image }}"
+
+      - name: "Vérifier la signature (preuve, pas promesse)"
+        run: |
+          set -euo pipefail
+          cosign verify \
+            --certificate-identity-regexp "^https://github\.com/${{ github.repository }}/" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "${{ steps.push.outputs.image }}"
+          echo "Signature vérifiée : l'image est liée à ce workflow GitHub."
+
+  # ==================================================================
+  # ÉTAPE 5 (plan Alpha 0.1, docs/10) — ISO anaconda installable
+  # bootc-image-builder génère une ISO type anaconda-iso qui EMBARQUE
+  # notre image (installation sans réseau possible, doc Fedora
+  # « Installing Fedora/CentOS bootc on Bare Metal »). Syntaxe vérifiée
+  # sur les documentations officielles osbuild/Fedora (25/11/2026).
+  # ==================================================================
+  build-iso:
+    name: "Générer l'ISO installable (anaconda-iso)"
+    needs: [build-and-test, publish-and-sign]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Lire le manifeste figé"
+        id: manifest
+        run: |
+          set -euo pipefail
+          python3 -c "import yaml" 2>/dev/null || pip3 install --quiet pyyaml
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import yaml
+          m = yaml.safe_load(open('build/manifest.yaml'))
+          print(f"image_version={m['image']['version']}")
+          EOF
+
+      - name: "Libérer de l'espace disque (l'ISO embarque ~4 Go)"
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup || true
+          df -h /
+
+      - name: "Construire l'ISO (bootc-image-builder, type anaconda-iso)"
+        run: |
+          set -euo pipefail
+          GHCR_IMAGE="ghcr.io/${{ github.repository_owner }}/hybridos"
+          TAG="desktop-${{ steps.manifest.outputs.image_version }}"
+          mkdir -p output
+          sudo podman run \
+            --rm \
+            --privileged \
+            --pull=newer \
+            --security-opt label=type:unconfined_t \
+            -v "${{ github.workspace }}/output:/output" \
+            quay.io/centos-bootc/bootc-image-builder:latest \
+            --type anaconda-iso \
+            "${GHCR_IMAGE}:${TAG}"
+          echo "--- Produit ---"
+          ls -lh output/
+
+      - name: "Empreinte SHA256 (critère doc 10 §5)"
+        run: |
+          set -euo pipefail
+          cd output
+          sha256sum *.iso | tee SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: "Archiver l'ISO (artefact téléchargeable)"
+        uses: actions/upload-artifact@v4
+        with:
+          name: hybridos-alpha01-iso
+          path: output/
+          retention-days: 30
+
