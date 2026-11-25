@@ -99,7 +99,7 @@ jobs:
             done
             echo ""
             echo "--- Inventaire rpm -qa (extrait, trié) ---"
-            podman run --rm "$IMG" bash -c 'rpm -qa | sort' | head -200
+            podman run --rm "$IMG" bash -c 'rpm -qa | sort | head -200'
           } > tests/reports/alpha01-step3-report.txt
           cat tests/reports/alpha01-step3-report.txt
 

@@ -6,7 +6,7 @@
 
 | Dossier | Rôle | Statut (25/11/2026) |
 |---|---|---|
-| `build/` | Chaîne de construction d'image | ✅ **Actif** — `manifest.yaml` (base figée), `image/Containerfile.base` (v0) |
+| `build/` | Chaîne de construction d'image | ✅ **Actif** — `manifest.yaml` (base figée par digest), `image/Containerfile.base` (v0, poussé), `image/Containerfile.desktop` (étape 3, push différé) |
 | `build/image/` | Containerfiles des couches (base → desktop → apps) | ✅ v0 présent (base sans modification) |
 | `build/iso/` | Génération ISO (bootc-image-builder) | 🕳 Vide — étape 5 du plan Alpha 0.1 |
 | `scripts/` | Outils communs (préflight, mesure, réparation) | 🕳 Vide — Phase 3/5 |
@@ -26,7 +26,7 @@
 | `recovery/` | Sauvegarde/restauration, clés LUKS, réparation ESP | 🕳 Vide — Phase 3/5 |
 | `updates/` | Mises à jour signées, historique, rollback | 🕳 Vide — Phase 4 |
 | `compatibility/` | Wine/Proton, profils de compatibilité | 🕳 Vide — Phase 4 |
-| `branding/` | Identité OPALE, logo, thèmes | 🟡 Référence seulement (maquette conceptuelle) |
+| `branding/` | Identité OPALE, logo, thèmes | ✅ **Actif (v0)** — wallpaper « Opale nuit » (script reproductible seed 42 + PNG 4K), palette KDE `HybridOpale.colors`, look-and-feel Plasma minimal ; maquette conceptuelle en `reference/` ; logo + thèmes complets = Phase 2 |
 | `documentation/` | Documentation technique/utilisateur | 🟡 Pointeur vers `docs/` + ce fichier |
 | `tests/` | Tous les tests (doc 09) | 🟡 `ci/test_image.sh` actif ; reste vide |
 | `tests/reports/` | Rapports de tests exécutés (traçabilité §6 doc 09) | 🕳 Rempli par la CI (artefacts) |
