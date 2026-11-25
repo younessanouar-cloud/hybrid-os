@@ -149,10 +149,15 @@ jobs:
       - name: "Installer cosign (Sigstore)"
         uses: sigstore/cosign-installer@v3
 
-      - name: "Connexion GHCR"
+      - name: "Connexion GHCR (podman)"
         run: |
           set -euo pipefail
           echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: "Connexion GHCR (cosign — registre d'authentification séparé)"
+        run: |
+          set -euo pipefail
+          cosign login ghcr.io -u "${{ github.actor }}" -p "${{ secrets.GITHUB_TOKEN }}"
 
       - name: "Construire et pousser l'image desktop vers GHCR"
         id: push
