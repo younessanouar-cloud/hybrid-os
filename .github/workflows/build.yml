@@ -253,3 +253,48 @@ jobs:
           path: output/
           retention-days: 30
 
+  # ==================================================================
+  # ÉTAPE 6 (plan Alpha 0.1, docs/10) — smoke test d'amorçage
+  # La VM amorce l'ISO en UEFI (OVMF) sans KVM (TCG = émulation
+  # logicielle) : noyau + initrd de l'ISO, systemd, chargeur
+  # d'installation Anaconda. La trace série complète est archivée
+  # MÊME en cas d'échec (diagnostic, doc 09 §6).
+  # ==================================================================
+  vm-smoke:
+    name: "Smoke boot VM (QEMU TCG + UEFI OVMF)"
+    needs: build-iso
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Télécharger l'ISO produite (même run)"
+        uses: actions/download-artifact@v4
+        with:
+          name: hybridos-alpha01-iso
+          path: iso/
+
+      - name: "Installer QEMU + OVMF + outils ISO"
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qemu-system-x86 ovmf libarchive-tools
+
+      - name: "Smoke boot (docs/09 niveau 2 — amorçage réel)"
+        run: |
+          set -euo pipefail
+          ISO_FILE=$(ls iso/*.iso | head -1)
+          echo "ISO testée : $ISO_FILE"
+          bash tests/vm/smoke_boot.sh "$ISO_FILE" 1800 4096
+
+      - name: "Archiver la trace série (même en échec — diagnostic)"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-boot-trace
+          path: tests/reports/smoke-boot-serial.log
+          retention-days: 90
+
+
