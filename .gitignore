@@ -1,0 +1,34 @@
+# Artefacts de build (jamais versionnés)
+build/
+output/
+*.qcow2
+*.raw
+*.iso
+*.oci
+*.tar
+
+# Secrets — JAMAIS dans le dépôt (règle cahier des charges §10)
+*.key
+*.pem
+*.crt
+*.p12
+secrets/
+.env
+credentials*
+
+# Dépendances locales
+.venv/
+vendor/
+
+# Éditeurs / OS
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logs et caches
+*.log
+__pycache__/
+.cache/
