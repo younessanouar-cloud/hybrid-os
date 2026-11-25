@@ -308,7 +308,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: smoke-boot-trace
-          path: tests/reports/smoke-boot-serial.log
+          path: |
+            tests/reports/smoke-boot-serial.log
+            tests/reports/qemu-stderr.log
           retention-days: 90
 
 

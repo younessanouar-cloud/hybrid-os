@@ -39,14 +39,22 @@ command -v qemu-system-x86_64 >/dev/null || {
   echo "qemu-system-x86_64 absent — installer : apt install qemu-system-x86 ovmf" >&2; exit 2; }
 [ -f "$ISO" ] || { echo "ISO introuvable : $ISO" >&2; exit 2; }
 
-# OVMF (firmware UEFI) — ordre de recherche des emplacements usuels
-OVMF=""
-for f in /usr/share/OVMF/OVMF_CODE_4M.fd /usr/share/ovmf/OVMF.fd \
-         /usr/share/OVMF/OVMF_CODE.fd; do
-  [ -f "$f" ] && OVMF="$f" && break
+# OVMF (firmware UEFI) — méthode pflash CANONIQUE (CODE + copie VARS) :
+# -bios seul avec OVMF 4M moderne peut refuser de démarrer.
+OVMF_CODE=""
+for f in /usr/share/OVMF/OVMF_CODE_4M.fd /usr/share/OVMF/OVMF_CODE.fd \
+         /usr/share/ovmf/OVMF_CODE.fd; do
+  [ -f "$f" ] && OVMF_CODE="$f" && break
 done
-[ -n "$OVMF" ] || { echo "OVMF introuvable — apt install ovmf" >&2; exit 2; }
-echo "Firmware UEFI : $OVMF"
+[ -n "$OVMF_CODE" ] || { echo "OVMF_CODE introuvable — apt install ovmf" >&2; exit 2; }
+OVMF_VARS_SRC=""
+for f in /usr/share/OVMF/OVMF_VARS_4M.fd /usr/share/OVMF/OVMF_VARS.fd \
+         /usr/share/ovmf/OVMF_VARS.fd; do
+  [ -f "$f" ] && OVMF_VARS_SRC="$f" && break
+done
+[ -n "$OVMF_VARS_SRC" ] || { echo "OVMF_VARS introuvable — apt install ovmf" >&2; exit 2; }
+cp "$OVMF_VARS_SRC" "$WORK/vars.fd"   # copie : QEMU écrit les variables NVRAM
+echo "Firmware UEFI : $OVMF_CODE (+ VARS $OVMF_VARS_SRC)"
 
 # ---------------------------------------------------------------------
 # 2. Extraire noyau + initrd + grub.cfg depuis l'ISO
@@ -88,20 +96,26 @@ echo "Paramètres kernel : $APPEND"
 # ---------------------------------------------------------------------
 # 4. Amorcer la VM (UEFI + ISO attachée, noyau direct, série sur log)
 # ---------------------------------------------------------------------
-echo "== Démarrage QEMU (TCG, UEFI) — capture série dans $LOG =="
+echo "== Démarrage QEMU (TCG, UEFI pflash) — capture série dans $LOG =="
 set +e
 timeout "${TIMEOUT_S}" qemu-system-x86_64 \
   -machine q35 -cpu max -smp 2 -m "${RAM_MB}" \
   -display none -serial file:"$LOG" \
-  -bios "$OVMF" \
+  -drive "if=pflash,format=raw,readonly=on,file=$OVMF_CODE" \
+  -drive "if=pflash,format=raw,file=$WORK/vars.fd" \
   -kernel "$KERNEL" -initrd "$INITRD" \
   -append "$APPEND" \
   -cdrom "$ISO" \
-  -net none >/dev/null 2>&1
+  -net none >"$WORK/qemu-stderr.log" 2>&1
 RC=$?
 set -e
 
 echo "== Fin QEMU (code $RC ; 124 = timeout prévu en smoke test) =="
+# Le stderr de QEMU n'est JAMAIS masqué (règle : diagnostic honnête)
+if [ -s "$WORK/qemu-stderr.log" ]; then
+  echo "--- stderr QEMU (à archiver avec la trace) ---"
+  cat "$WORK/qemu-stderr.log"
+fi
 
 # ---------------------------------------------------------------------
 # 5. Analyser la trace série — critères de succès explicites
@@ -136,6 +150,7 @@ fi
 # Rapport (traçabilité doc 09 §6)
 mkdir -p tests/reports
 cp "$LOG" "tests/reports/smoke-boot-serial.log" 2>/dev/null || true
+cp "$WORK/qemu-stderr.log" "tests/reports/qemu-stderr.log" 2>/dev/null || true
 echo "Trace complète archivée : tests/reports/smoke-boot-serial.log"
 
 if [ "$FAIL" -eq 1 ]; then
