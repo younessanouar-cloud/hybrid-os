@@ -226,6 +226,8 @@ jobs:
           GHCR_IMAGE="ghcr.io/${{ github.repository_owner }}/hybridos"
           TAG="desktop-${{ steps.manifest.outputs.image_version }}"
           mkdir -p output
+          echo "--- Pull de l'image source (le builder ne pull plus lui-même) ---"
+          sudo podman pull "${GHCR_IMAGE}:${TAG}"
           sudo podman run \
             --rm \
             --privileged \
