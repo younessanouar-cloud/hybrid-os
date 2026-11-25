@@ -245,9 +245,15 @@ jobs:
       - name: "Empreinte SHA256 (critère doc 10 §5)"
         run: |
           set -euo pipefail
-          cd output
-          sha256sum *.iso | tee SHA256SUMS.txt
-          cat SHA256SUMS.txt
+          ISO_PATH=$(find output -name "*.iso" -type f | head -1)
+          if [ -z "$ISO_PATH" ]; then
+            echo "Aucun fichier .iso trouvé dans output/ — contenu réel :" >&2
+            find output -type f -exec ls -lh {} \; >&2
+            exit 1
+          fi
+          echo "ISO produite : $ISO_PATH"
+          ls -lh "$ISO_PATH"
+          sha256sum "$ISO_PATH" | tee output/SHA256SUMS.txt
 
       - name: "Archiver l'ISO (artefact téléchargeable)"
         uses: actions/upload-artifact@v4
@@ -288,7 +294,12 @@ jobs:
       - name: "Smoke boot (docs/09 niveau 2 — amorçage réel)"
         run: |
           set -euo pipefail
-          ISO_FILE=$(ls iso/*.iso | head -1)
+          ISO_FILE=$(find iso -name "*.iso" -type f | head -1)
+          if [ -z "$ISO_FILE" ]; then
+            echo "Aucune ISO dans l'artefact téléchargé — contenu :" >&2
+            find iso -type f -exec ls -lh {} \; >&2
+            exit 1
+          fi
           echo "ISO testée : $ISO_FILE"
           bash tests/vm/smoke_boot.sh "$ISO_FILE" 1800 4096
 
