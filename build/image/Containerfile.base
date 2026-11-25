@@ -1,0 +1,24 @@
+# HYBRID OS — image de base v0 (Alpha 0.1, étape 1)
+# =====================================================================
+# v0 = base amont SANS modification : cette image valide uniquement que
+# NOTRE chaîne de construction (CI, manifeste figé, tests) produit
+# correctement l'image amont. Aucune personnalisation avant l'étape 2
+# (plan docs/10_PLAN_ALPHA_01.md).
+#
+# La base est FIGÉE par digest dans build/manifest.yaml.
+# RÈGLE : ne jamais remplacer la référence par un tag flottant ; toute
+# évolution = mise à jour du manifeste + tests CI bloquants.
+# =====================================================================
+ARG BASE_IMAGE="quay.io/fedora/fedora-kinoite:45"
+FROM ${BASE_IMAGE}
+
+LABEL org.opencontainers.image.title="HYBRID OS base" \
+      org.opencontainers.image.description="HYBRID OS v0 — base Fedora Kinoite (Atomic Desktop KDE) sans modification ; validation de la chaîne de build CI" \
+      org.opencontainers.image.vendor="HYBRID OS Project" \
+      org.opencontainers.image.licenses="ASL-2.0 AND BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT" \
+      org.opencontainers.image.base.name="quay.io/fedora/fedora-kinoite:45" \
+      org.hybridos.version="0.1.0-alpha.1" \
+      org.hybridos.phase="alpha-0.1-step1"
+
+# Rien d'autre en v0 (règle d'honnêteté : l'étape 1 ne déclare aucune
+# fonctionnalité — elle déclare uniquement la maîtrise de la construction).

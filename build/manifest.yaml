@@ -1,0 +1,29 @@
+# =====================================================================
+# Manifeste des versions — SOURCE UNIQUE DE VÉRITÉ du build (ADR-002).
+# RÈGLE : toute modification de ce fichier = revue + tests CI bloquants.
+#
+# Figeage effectué le 2026-11-25 par interrogation directe de l'API
+# publique de quay.io (endpoint : /api/v1/repository/fedora/fedora-kinoite/tag/).
+# Le tag « 45 » désignait alors la version stable courante de Fedora
+# Kinoite (Atomic Desktop KDE), manifest-list mis à jour par l'amont le
+# 2026-11-25 02:03 UTC. Fedora 44 reste publié en parallèle ; 46 = rawhide.
+# =====================================================================
+
+base:
+  registry: quay.io
+  repository: fedora/fedora-kinoite
+  tag: "45"
+  # Digest du manifest-list (multi-arch) au moment du figeage :
+  digest: "sha256:79f701ea3702d905ca3c48efd8f9594987d3f23db5f17c5e8395a6f5d1335da0"
+  arch_target: x86_64        # cible v1 (doc 02) — aarch64 également publié par l'amont
+  verified_at: "2026-11-25"
+  notes: >
+    Fedora Kinoite = Atomic Desktop officiel KDE de Fedora, géré bootc
+    (Image Mode). La CI construit TOUJOURS par digest (reproductibilité) ;
+    un contrôleur de dérive compare le tag vivant au digest figé et alerte
+    quand l'amont avance (fenêtre de rebase, doc 09).
+
+image:
+  name: hybridos/base
+  version: "0.1.0-alpha.1"
+  phase: alpha-0.1-step1

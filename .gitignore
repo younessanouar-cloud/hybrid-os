@@ -1,5 +1,8 @@
-# Artefacts de build (jamais versionnés)
-build/
+# Artefacts de build (jamais versionnés) — ⚠ ne JAMAIS ignorer build/
+# lui-même : c'est un dossier SOURCE du cahier des charges (§10).
+build/output/
+build/cache/
+build/local/
 output/
 *.qcow2
 *.raw
