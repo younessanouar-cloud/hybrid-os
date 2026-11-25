@@ -1,0 +1,16 @@
+# Force LF pour tout ce qui s'exécute ou se parse côté Linux/CI
+# (le dépôt est édité sous Windows — core.autocrlf pourrait sinon
+# corrompre les scripts en CRLF au checkout sur les runners).
+* text=auto
+*.sh  text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+Containerfile* text eol=lf
+*.py  text eol=lf
+*.md  text eol=auto
+
+# Binaires jamais convertis
+*.png binary
+*.ico binary
+*.qcow2 binary
+*.iso binary

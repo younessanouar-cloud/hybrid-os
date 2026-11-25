@@ -1,0 +1,96 @@
+name: "CI — Image build & tests"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: "Build image v0 + tests niveau conteneur"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Lire le manifeste figé"
+        id: manifest
+        run: |
+          set -euo pipefail
+          python3 -c "import yaml" 2>/dev/null || pip3 install --quiet pyyaml
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import yaml
+          m = yaml.safe_load(open('build/manifest.yaml'))
+          b = m['base']
+          print(f"base_ref={b['registry']}/{b['repository']}@{b['digest']}")
+          print(f"base_tag={b['tag']}")
+          print(f"base_digest={b['digest']}")
+          print(f"image_name={m['image']['name']}")
+          print(f"image_version={m['image']['version']}")
+          EOF
+
+      - name: "Contrôle de dérive amont (tag vivant vs digest figé)"
+        run: |
+          set -euo pipefail
+          CURRENT=$(curl -fsSL "https://quay.io/api/v1/repository/fedora/fedora-kinoite/tag/?limit=100&onlyActiveTags=true" \
+            | python3 -c "import json,sys; tags={t['name']:t['manifest_digest'] for t in json.load(sys.stdin)['tags']}; print(tags.get('${{ steps.manifest.outputs.base_tag }}', 'ABSENT'))")
+          echo "Digest courant du tag ${{ steps.manifest.outputs.base_tag }} : $CURRENT"
+          if [ "$CURRENT" = "ABSENT" ]; then
+            echo "::error::Le tag amont ${{ steps.manifest.outputs.base_tag }} n'existe plus sur quay.io — rebase du manifeste OBLIGATOIRE."
+            exit 1
+          fi
+          if [ "$CURRENT" != "${{ steps.manifest.outputs.base_digest }}" ]; then
+            echo "::warning::L'amont a avancé (figé=${{ steps.manifest.outputs.base_digest }}, courant=$CURRENT). Rebase à planifier : mettre à jour build/manifest.yaml puis relancer la fenêtre de tests complète (doc 09)."
+          else
+            echo "Amont inchangé depuis le figeage du manifeste."
+          fi
+
+      - name: "Construire l'image (par digest — reproductible)"
+        run: |
+          set -euo pipefail
+          podman build \
+            --build-arg BASE_IMAGE="${{ steps.manifest.outputs.base_ref }}" \
+            -t "${{ steps.manifest.outputs.image_name }}:${{ steps.manifest.outputs.image_version }}" \
+            -f build/image/Containerfile.base .
+
+      - name: "Tests niveau conteneur (docs/09 — niveau 1)"
+        run: |
+          set -euo pipefail
+          bash tests/ci/test_image.sh \
+            "${{ steps.manifest.outputs.image_name }}:${{ steps.manifest.outputs.image_version }}"
+
+      - name: "Générer le rapport de build (traçabilité doc 09 §6)"
+        run: |
+          set -euo pipefail
+          IMG="${{ steps.manifest.outputs.image_name }}:${{ steps.manifest.outputs.image_version }}"
+          mkdir -p tests/reports
+          {
+            echo "=== RAPPORT DE BUILD — Alpha 0.1 étape 1 ==="
+            echo "Date (UTC)     : $(date -u '+%Y-%m-%d %H:%M:%S')"
+            echo "Base figée     : ${{ steps.manifest.outputs.base_ref }}"
+            echo "Tag amont      : ${{ steps.manifest.outputs.base_tag }}"
+            echo "Image produite : $IMG"
+            echo "Runner         : ${{ runner.os }} ${{ runner.arch }}"
+            echo ""
+            echo "--- Taille ---"
+            podman images --format '{{.Repository}}:{{.Tag}} {{.Size}}' | grep hybridos || true
+            echo ""
+            echo "--- Versions clés ---"
+            echo -n "bootc           : "; podman run --rm "$IMG" bootc --version
+            echo -n "kernel-core     : "; podman run --rm "$IMG" rpm -q kernel-core
+            echo -n "plasma-workspace : "; podman run --rm "$IMG" rpm -q plasma-workspace
+            echo -n "selinux-policy  : "; podman run --rm "$IMG" rpm -q selinux-policy-targeted
+            echo ""
+            echo "--- Inventaire rpm -qa (extrait, trié) ---"
+            podman run --rm "$IMG" bash -c 'rpm -qa | sort' | head -200
+          } > tests/reports/alpha01-step1-report.txt
+          cat tests/reports/alpha01-step1-report.txt
+
+      - name: "Archiver le rapport"
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-build-alpha01-step1
+          path: tests/reports/alpha01-step1-report.txt
+          retention-days: 90
