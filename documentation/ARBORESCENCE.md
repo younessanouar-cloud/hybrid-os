@@ -26,7 +26,7 @@
 | `recovery/` | Sauvegarde/restauration, clés LUKS, réparation ESP | 🕳 Vide — Phase 3/5 |
 | `updates/` | Mises à jour signées, historique, rollback | 🕳 Vide — Phase 4 |
 | `compatibility/` | Wine/Proton, profils de compatibilité | 🕳 Vide — Phase 4 |
-| `branding/` | Identité OPALE, logo, thèmes | ✅ **Actif (v0)** — wallpaper « Opale nuit » (script reproductible seed 42 + PNG 4K), palette KDE `HybridOpale.colors`, look-and-feel Plasma minimal ; maquette conceptuelle en `reference/` ; logo + thèmes complets = Phase 2 |
+| `branding/` | Identité OPALE, logo, thèmes | ✅ **Actif (Phase 2)** — logo ×5 (script reproductible), wallpaper 4K, palette KDE, look-and-feel (defaults + KSplash + layout bureau), SDDM, **icônes hicolor de marque** (`start-here` lanceur + `hybridos` + pastille SELinux, 21 fichiers générés par script) ; maquette conceptuelle en `reference/` ; jeu d'icônes complet et thèmes KWin = Phase 2+ |
 | `documentation/` | Documentation technique/utilisateur | 🟡 Pointeur vers `docs/` + ce fichier |
 | `tests/` | Tous les tests (doc 09) | 🟡 `ci/test_image.sh` actif ; reste vide |
 | `tests/reports/` | Rapports de tests exécutés (traçabilité §6 doc 09) | 🕳 Rempli par la CI (artefacts) |

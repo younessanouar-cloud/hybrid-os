@@ -40,6 +40,10 @@ COPY branding/opale/sddm/hybridos.conf /etc/sddm.conf.d/hybridos.conf
 COPY applications/libopale/ \
      /usr/lib64/qt6/qml/org/hybridos/opale/
 
+# --- 7. Icônes de marque OPALE (hicolor — start-here = lanceur du dock) ---
+COPY branding/opale/icons/hicolor/ \
+     /usr/share/icons/hicolor/
+
 LABEL org.opencontainers.image.title="HYBRID OS desktop" \
       org.opencontainers.image.description="HYBRID OS desktop — Fedora Kinoite (Atomic KDE) + design system OPALE : wallpaper, palette, KSplash QML, SDDM, disposition du bureau, locale FR" \
       org.opencontainers.image.vendor="HYBRID OS Project" \
