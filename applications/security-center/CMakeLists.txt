@@ -5,13 +5,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2)
 
 qt_add_executable(hybrid-security-center
     src/main.cpp
     src/securitybridge.cpp
 )
-target_link_libraries(hybrid-security-center PRIVATE Qt6::Quick)
+target_link_libraries(hybrid-security-center PRIVATE Qt6::Quick Qt6::QuickControls2)
 
 # Module QML embarqué dans l'exécutable (ressources qrc — Qt 6.5+)
 qt_add_qml_module(hybrid-security-center

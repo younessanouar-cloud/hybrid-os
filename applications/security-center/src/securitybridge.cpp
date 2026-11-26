@@ -37,6 +37,38 @@ void SecurityBridge::query(const QString &key, const QString &program,
     proc->start(program, args);
 }
 
+void SecurityBridge::queryEncrypted()
+{
+    auto *proc = new QProcess(this);
+    connect(proc, &QProcess::finished, this,
+            [this, proc](int code, QProcess::ExitStatus status) {
+                const bool ok = (code == 0 && status == QProcess::NormalExit);
+                if (!ok) {
+                    emit ready("chiffrement", QString(), false);
+                    proc->deleteLater();
+                    return;
+                }
+                // Compte les volumes de type "crypt" = chiffrement LUKS actif
+                const QStringList lignes = QString::fromUtf8(
+                    proc->readAllStandardOutput()).split('\n', Qt::SkipEmptyParts);
+                int crypts = 0;
+                for (const QString &l : lignes) {
+                    if (l.trimmed() == "crypt") crypts++;
+                }
+                const QString valeur = (crypts > 0)
+                    ? tr("%1 volume(s) chiffré(s) actif(s) — LUKS").arg(crypts)
+                    : tr("aucun volume chiffré détecté");
+                emit ready("chiffrement", valeur, true);
+                proc->deleteLater();
+            });
+    connect(proc, &QProcess::errorOccurred, this,
+            [this, proc](QProcess::ProcessError) {
+                emit ready("chiffrement", QString(), false);
+                proc->deleteLater();
+            });
+    proc->start("lsblk", {"--noheadings", "-o", "TYPE"});
+}
+
 void SecurityBridge::queryAll()
 {
     // --- Sources RÉELLES (doc 06 §2) — lecture seule ---
@@ -50,6 +82,13 @@ void SecurityBridge::queryAll()
     query("kernel", "uname", {"-r"});
     // Version du système
     query("release", "cat", {"/etc/fedora-release"});
+    // Système atomique : image de référence en cours (bootc)
+    query("image", "bootc", {"status"});
+    // Journal système : occupation réelle (peut nécessiter le groupe
+    // systemd-journal → si refusé, l'UI affichera « non vérifiable »)
+    query("journal", "journalctl", {"--disk-usage"});
+    // Chiffrement : volumes LUKS actifs (parse lsblk)
+    queryEncrypted();
 }
 
 QString SecurityBridge::mapKeyToTitle(const QString &key)

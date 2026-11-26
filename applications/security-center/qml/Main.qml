@@ -65,11 +65,14 @@ ApplicationWindow {
         // --- Rubriques REELLES (une par source câblée) ---
         Repeater {
             model: [
-                { key: "release",    titre: qsTr("Système"),       accent: "eclair" },
-                { key: "kernel",     titre: qsTr("Noyau"),         accent: "eclair" },
-                { key: "selinux",    titre: qsTr("SELinux"),       accent: "flambee" },
-                { key: "firewall",   titre: qsTr("Pare-feu"),      accent: "flambee" },
-                { key: "secureboot", titre: qsTr("Secure Boot"),  accent: "flambee" }
+                { key: "release",    titre: qsTr("Système"),         accent: "eclair" },
+                { key: "kernel",     titre: qsTr("Noyau"),           accent: "eclair" },
+                { key: "image",      titre: qsTr("Image système"),  accent: "eclair" },
+                { key: "selinux",    titre: qsTr("SELinux"),         accent: "flambee" },
+                { key: "firewall",   titre: qsTr("Pare-feu"),        accent: "flambee" },
+                { key: "secureboot", titre: qsTr("Secure Boot"),   accent: "flambee" },
+                { key: "chiffrement", titre: qsTr("Chiffrement"),   accent: "brume" },
+                { key: "journal",    titre: qsTr("Journal système"), accent: "brume" }
             ]
             OpaleCard {
                 Layout.fillWidth: true
@@ -136,8 +139,8 @@ ApplicationWindow {
             opacity: 0.7
             font.pointSize: 8
             text: qsTr("Tableau de bord d'état du système — ce n'est PAS un antivirus temps réel. " +
-                       "Les rubriques chiffrement, mises à jour et journal des événements seront " +
-                       "ajoutées avec leurs sources réelles (Phase 3).")
+                       "Chaque valeur est le résultat d'une vérification réelle au moment de " +
+                       "l'ouverture (échec de vérification = « non vérifiable »).")
         }
     }
 }

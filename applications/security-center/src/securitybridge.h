@@ -8,6 +8,7 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QHash>
 
 class SecurityBridge : public QObject
 {
@@ -17,6 +18,10 @@ public:
 
     // Lancé au démarrage de l'application : interroge toutes les sources
     Q_INVOKABLE void queryAll();
+
+    // Rubrique « chiffrement » : parse la sortie réelle de lsblk
+    // (les volumes déchiffrés activement sont de TYPE "crypt")
+    Q_INVOKABLE void queryEncrypted();
 
 signals:
     void ready(const QString &key, const QString &value, bool ok);

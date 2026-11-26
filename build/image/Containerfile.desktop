@@ -9,7 +9,7 @@
 ARG BASE_IMAGE="quay.io/fedora/fedora-kinoite:45"
 FROM ${BASE_IMAGE} AS builder
 
-RUN dnf -y install gcc-c++ cmake qt6-qtdeclarative-devel \
+RUN dnf -y install gcc-c++ cmake qt6-qtdeclarative-devel qt6-qtquickcontrols2-devel \
     && dnf clean all
 
 # Security Center (Phase 3 ébauche — sources réelles, doc 06)
