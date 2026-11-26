@@ -1,9 +1,11 @@
 # HYBRID OS — Distribution hybride nouvelle génération
 
-> **Statut : Alpha 0.1 ATTEINT (26/11/2026) — ISO amorçable construite de façon
-> reproductible et bootée en VM UEFI. Preuves : `tests/reports/run45719798169/`.**
-> Validation client du jalon en cours — ensuite : mesures, installation
-> automatisée, puis Phase 2 (interface complète OPALE).
+> **Statut : Alpha 0.1 COMPLET (26/11/2026) — 8/8 étapes validées par exécution
+> CI réelle.** ISO installable **bootée en VM UEFI** + **installation kickstart
+> automatisée prouvée** (SELinux enforcing constaté). Preuves :
+> `tests/reports/run45719798169/BOOT_PROOF.md` et
+> `tests/reports/run45772086234/INSTALL_PROOF.md`. Tag : `v0.1.0-alpha`.
+> Suite : Phase 2 — interface complète OPALE (logo, thèmes, applications).
 
 > Phase 1 (conception) : dossier complet dans `docs/` — vérifié le 25/11/2026.
 

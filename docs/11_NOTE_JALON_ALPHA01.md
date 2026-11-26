@@ -38,6 +38,18 @@ bootc 1.17.1 · SELinux policy 45.24 · branding OPALE 4/4 fichiers embarqués
 7. ISO produite dans `output/bootiso/` → chemins récursifs ; et OVMF 4M en
    mode pflash canonique (CODE + VARS), stderr QEMU toujours capturé
 
+## Complément du 26/11 (matin) — étape 7 exécutée : installation complète prouvée
+
+Le run `45772086234` (après rebase de la base) a validé **l'installation
+kickstart automatisée de bout en bout** : ISO → Anaconda kickstart → système
+installé sur disque virtuel → redémarrage sur ce disque → SSH → mesures.
+Constats réels : noyau installé `7.3.4-300.fc45`, **SELinux enforcing après
+installation** (critère bloquant doc 09 ✅), RAM 461 Mo en multi-user sans
+bureau, boot 1 min 13 en TCG (non représentatif — voir limites détaillées
+dans `tests/reports/run45772086234/INSTALL_PROOF.md`).
+
+**Alpha 0.1 est COMPLET** (8/8 étapes validées par exécution réelle).
+
 ## Ce que Alpha 0.1 ne couvre PAS (règle d'honnêteté §12)
 
 - L'installation complète sur disque et les mesures → **suite immédiate**

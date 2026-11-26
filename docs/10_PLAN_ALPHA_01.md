@@ -37,8 +37,8 @@
 | 4 | Signature cosign (clé de test, hors dépôt) + publication registre GHCR | Image signée | Vérification `cosign verify` en CI |
 | 5 | Génération ISO via `bootc-image-builder` (`anaconda-iso`) + artefact CI téléchargeable | ISO Alpha 0.1 + SHA256 publié | ✅ **VALIDÉE** — run 45719798169 : ISO `install.iso`, SHA256 `10bda05f…` (4 fixes documentés : storage monté, pre-pull, `--rootfs xfs`, chemins) |
 | 6 | Test VM documenté : boot de l'ISO en UEFI/OVMF (QEMU TCG) | Rapport de test + trace série | ✅ **VALIDÉE (amorçage)** — noyau 7.2.11-300.fc45 + systemd + Anaconda atteints ; preuve archivée `tests/reports/run45719798169/BOOT_PROOF.md` (l'installation complète sur disque = suite du plan) |
-| 7 | Mesures initiales (RAM, boot) vs Fedora référence | `tests/reports/alpha01-perf` | ⏳ À faire |
-| 8 | Retour d'expérience + correction + tag `v0.1.0-alpha` | Note de jalon + release | ⏳ En cours — **validation client du jalon demandée** |
+| 7 | Mesures initiales (RAM, boot) vs Fedora référence | `tests/reports/alpha01-perf` | ✅ **VALIDÉE (méthode + socle)** — run 45772086234 : installation 47 min, SELinux **enforcing** ✅, RAM 461 Mo en multi-user (sans bureau), boot 1min13 TCG ; limites + bugs de mesure documentés dans `tests/reports/run45772086234/INSTALL_PROOF.md` ; mesures matériel = Phase 5 |
+| 8 | Retour d'expérience + correction + tag `v0.1.0-alpha` | Note de jalon + release | ✅ **VALIDÉE** — tag `v0.1.0-alpha` posé, note `docs/11` complétée avec les résultats d'installation, **validation client du jalon obtenue le 26/11/2026** |
 
 ## Critères de succès (tous obligatoires)
 
