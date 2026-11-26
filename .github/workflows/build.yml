@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      scenario:
+        description: "full = installation + mesures · capture = idem + captures d'écran du bureau"
+        type: choice
+        options: [full, capture]
+        default: full
 
 jobs:
   build-and-test:
@@ -341,7 +347,7 @@ jobs:
   vm-install-measure:
     name: "Installation kickstart + mesures (TCG, ~3-4 h)"
     needs: build-iso
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.scenario != 'capture'
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     steps:
@@ -388,6 +394,65 @@ jobs:
             tests/reports/install-serial.log
             tests/reports/boot-installed-serial.log
           retention-days: 90
+
+  # ==================================================================
+  # VALIDATION VISUELLE RÉELLE (règle §12 — levée par screendumps)
+  # Même installation kickstart que vm-install-measure, PUIS captures
+  # du framebuffer pendant que le système installé démarre vers
+  # graphical.target (cible : l'écran SDDM OPALE rendu réellement).
+  # Déclenchement : workflow_dispatch avec scenario=capture.
+  # ==================================================================
+  vm-capture:
+    name: "Installation + captures du bureau (TCG, ~2 h)"
+    needs: build-iso
+    if: github.event_name == 'workflow_dispatch' && inputs.scenario == 'capture'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Lire le manifeste figé"
+        id: manifest
+        run: |
+          set -euo pipefail
+          python3 -c "import yaml" 2>/dev/null || pip3 install --quiet pyyaml
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import yaml
+          m = yaml.safe_load(open('build/manifest.yaml'))
+          print(f"image_version={m['image']['version']}")
+          EOF
+
+      - name: "Télécharger l'ISO (générée par build-iso dans CE run)"
+        uses: actions/download-artifact@v4
+        with:
+          name: hybridos-alpha01-iso
+          path: iso/
+
+      - name: "Installer QEMU + OVMF + outils + socat + PIL"
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qemu-system-x86 ovmf libarchive-tools \
+            sshpass socat python3-pil
+
+      - name: "Installation + boot + captures (screendumps réels)"
+        run: |
+          set -euo pipefail
+          ISO_FILE=$(find iso -name "*.iso" -type f | head -1)
+          [ -n "$ISO_FILE" ] || { echo "Aucune ISO dans l'artefact"; exit 1; }
+          CAPTURE=1 bash tests/vm/install_vm.sh "$ISO_FILE" 9000 2400 4096 40
+
+      - name: "Archiver rapports + captures (même en échec)"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: captures-bureau-reel
+          path: |
+            tests/reports/install-measure-report.txt
+            tests/reports/captures/
+          retention-days: 90
+          if-no-files-found: warn
 
 
 

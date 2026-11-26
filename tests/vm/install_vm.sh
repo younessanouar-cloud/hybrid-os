@@ -123,10 +123,12 @@ set +e
 qemu-system-x86_64 \
   -machine q35 -cpu max -smp 2 -m "${RAM_MB}" \
   -display none -serial file:"$LOG_BOOT" \
+  -vga std \
   -drive "if=pflash,format=raw,readonly=on,file=$OVMF_CODE" \
   -drive "if=pflash,format=raw,file=$WORK/vars-boot.fd" \
   -drive "file=$WORK/disk.qcow2,if=virtio,format=qcow2" \
   -netdev user,id=n0,hostfwd=tcp::2222-:22 -device e1000,netdev=n0 \
+  -monitor "unix:$WORK/qemu-mon.sock,server,nowait" \
   >"$WORK/qemu-boot-stderr.log" 2>&1 &
 QEMU_PID=$!
 set -e
@@ -167,6 +169,50 @@ sleep 60   # laisser le système se stabiliser après login possibility
   echo "Rappel honnêteté : mesures en émulation TCG. Objectifs cahier des charges"
   echo "(RAM ≤ 1,8 Go, boot ≤ 20 s) : à mesurer sur machine de référence (doc 09 §3)."
 } | tee "$REPORT"
+
+# ---------------------------------------------------------------------
+# D. Captures d'écran RÉELLES (optionnel : CAPTURE=1) — lever la règle
+#    §12 pour les rendus : ce ne sont pas des maquettes, ce sont des
+#    screendumps du framebuffer de la VM qui démarre réellement.
+#    Cible : l'écran de connexion SDDM OPALE (graphical.target).
+# ---------------------------------------------------------------------
+if [ "${CAPTURE:-0}" = "1" ]; then
+  echo "== Phase D : captures du bureau (screendumps QEMU monitor) =="
+  command -v socat >/dev/null || fail "socat absent — apt install socat"
+  mkdir -p tests/reports/captures
+  N=0
+  for ATTENTE in 60 60 120 120 180 180 240; do
+    sleep "$ATTENTE"
+    N=$((N+1))
+    SHOT="$WORK/shot-$N.ppm"
+    echo "screendump $SHOT" | socat - UNIX-CONNECT:"$WORK/qemu-mon.sock" 2>/dev/null || true
+    echo "capture $N prise (attente cumulée ~$((60+60+120+120+180+180+240))s max)"
+  done
+  kill "$QEMU_PID" 2>/dev/null || true; QEMU_PID=""
+
+  echo "--- Analyse des captures (statistiques réelles du framebuffer) ---"
+  CAPTURES_DIR="tests/reports/captures" WORK="$WORK" python3 - <<'EOF' || true
+from PIL import Image
+import glob, os, statistics
+
+work = os.environ["WORK"]
+outdir = os.environ["CAPTURES_DIR"]
+for ppm in sorted(glob.glob(os.path.join(work, "shot-*.ppm"))):
+    try:
+        img = Image.open(ppm).convert("RGB")
+    except Exception:
+        continue
+    ech = list(img.getdata())[::37]
+    lums = [(p[0] + p[1] + p[2]) / 3 for p in ech[:500]]
+    lum = statistics.mean(lums)
+    var = statistics.pstdev(lums)
+    nom = os.path.basename(ppm).replace(".ppm", ".png")
+    img.save(os.path.join(outdir, nom), "PNG")
+    vivant = "ÉCRAN NON UNIFORME (contenu réel affiché)" if var > 8 else "uniforme (fond/simple)"
+    print(f"{nom}: {img.size}, luminosité {lum:.0f}/255, variation {var:.1f} — {vivant}")
+EOF
+  echo "Captures archivées : tests/reports/captures/"
+fi
 
 kill "$QEMU_PID" 2>/dev/null || true; QEMU_PID=""
 cp "$LOG_INSTALL" tests/reports/install-serial.log 2>/dev/null || true
