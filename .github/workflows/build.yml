@@ -106,7 +106,17 @@ jobs:
               podman run --rm "$IMG" test -f "$f" && echo "PRÉSENT" || echo "ABSENT"
             done
             echo ""
+            echo "--- Applications natives embarquées (Security Center) ---"
+            for f in /usr/bin/hybrid-security-center \
+                     /usr/share/applications/hybrid-security-center.desktop \
+                     /usr/lib64/qt6/qml/org/hybridos/opale/qmldir \
+                     /usr/lib64/qt6/qml/org/hybridos/opale/OpaleTheme.qml; do
+              echo -n "$f : "
+              podman run --rm "$IMG" test -f "$f" && echo "PRÉSENT" || echo "ABSENT"
+            done
+            echo ""
             echo "--- Inventaire rpm -qa (extrait, trié) ---"
+            podman run --rm "$IMG" bash -c 'rpm -qa | sort | head -200'
             podman run --rm "$IMG" bash -c 'rpm -qa | sort | head -200'
           } > tests/reports/alpha01-step3-report.txt
           cat tests/reports/alpha01-step3-report.txt

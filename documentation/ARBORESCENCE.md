@@ -17,7 +17,7 @@
 | `desktop/` | HYBRID Desktop (Plasma + OPALE, doc 07) | 🟡 **Actif (Phase 2)** — disposition par défaut (`layout.js` dans le look-and-feel) ; composants dock/lanceur custom = Phase 2+ |
 | `desktop/shell/` `dock/` `launcher/` `notifications/` `settings/` | Composants du bureau | 🕳 Vide — Phase 2 |
 | `applications/` | Applications natives Kirigami | 🟡 **Actif (Phase 2)** — `libopale/` : bibliothèque QML de composants OPALE (OpaleTheme tokens + OpaleButton + OpaleCard), socle des apps Phase 3-4 |
-| `applications/security-center/` | Hybrid Security Center (doc 06) | 🟡 **Actif (ébauche Phase 3)** — app Qt6 compilée au build (multi-stage), pont C++ vers les **vraies commandes** (`getenforce`, `firewall-cmd --state`, `mokutil --sb-state`, `uname`, release), UI libopale ; rubriques non câblées absentes (règle doc 06 : rien de simulé) |
+| `applications/security-center/` | Hybrid Security Center (doc 06) | ✅ **Actif et VALIDÉ CI** (run 45871646216 : compile, installé `/usr/bin/`, .desktop menu) — pont C++ vers les **vraies commandes** (`getenforce`, `firewall-cmd --state`, `mokutil --sb-state`, `uname`, release, `bootc status`, `journalctl --disk-usage`, parse `lsblk` crypt), UI libopale 8 rubriques ; échec = « non vérifiable », rubriques non câblées absentes (règle doc 06) |
 | `applications/app-store/` | Hybrid Store (doc 02) | 🕳 Vide — Phase 4 |
 | `applications/file-manager/` | Intégration explorateur | 🕳 Vide — Phase 4 |
 | `applications/control-center/` | Paramètres regroupés | 🕳 Vide — Phase 4 |

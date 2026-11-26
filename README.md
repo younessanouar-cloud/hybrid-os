@@ -1,14 +1,11 @@
 # HYBRID OS — Distribution hybride nouvelle génération
 
-> **Statut : Alpha 0.1 COMPLET (8/8) + Phase 2 en cours — lot 1 VALIDÉ CI
-> (26/11/2026)** : image desktop v0.2.0-alpha.1 embarquant l'identité OPALE
-> (logo facetté ×5, KSplash QML sur vraies étapes, SDDM, disposition du
-> bureau) — **11/11 fichiers constatés PRÉSENTS** (run 45831653413 vert,
-> smoke boot OK 31m40s). Bibliothèque `libopale` (tokens + composants QML)
-> en validation. Rendus visuels à constater sur VM graphique/matériel
-> (Phase 5) — règle §12 : aucune capture présentée comme preuve de rendu.
-> Tag : `v0.1.0-alpha` · Preuves : `tests/reports/run45719798169/`,
-> `run45772086234/`.
+> **Statut (26/11/2026, soir) : Alpha 0.1 COMPLET (8/8) + Phase 2 en cours —
+> 4 validations CI vertes ce jour** (branding OPALE 11/11 · bibliothèque
+> `libopale` · icônes hicolor · **première application native : Hybrid
+> Security Center compilée multi-stage, 8 rubriques sur sources réelles** —
+> run 45871646216 vert, ISO bootée en VM). Rendus visuels à constater sur
+> VM graphique/matériel (Phase 5) — règle §12. Tag : `v0.1.0-alpha`.
 
 > Phase 1 (conception) : dossier complet dans `docs/` — vérifié le 25/11/2026.
 
