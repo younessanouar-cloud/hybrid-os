@@ -1,11 +1,14 @@
 # HYBRID OS — Distribution hybride nouvelle génération
 
-> **Statut : Alpha 0.1 COMPLET (26/11/2026) — 8/8 étapes validées par exécution
-> CI réelle.** ISO installable **bootée en VM UEFI** + **installation kickstart
-> automatisée prouvée** (SELinux enforcing constaté). Preuves :
-> `tests/reports/run45719798169/BOOT_PROOF.md` et
-> `tests/reports/run45772086234/INSTALL_PROOF.md`. Tag : `v0.1.0-alpha`.
-> Suite : Phase 2 — interface complète OPALE (logo, thèmes, applications).
+> **Statut : Alpha 0.1 COMPLET (8/8) + Phase 2 en cours — lot 1 VALIDÉ CI
+> (26/11/2026)** : image desktop v0.2.0-alpha.1 embarquant l'identité OPALE
+> (logo facetté ×5, KSplash QML sur vraies étapes, SDDM, disposition du
+> bureau) — **11/11 fichiers constatés PRÉSENTS** (run 45831653413 vert,
+> smoke boot OK 31m40s). Bibliothèque `libopale` (tokens + composants QML)
+> en validation. Rendus visuels à constater sur VM graphique/matériel
+> (Phase 5) — règle §12 : aucune capture présentée comme preuve de rendu.
+> Tag : `v0.1.0-alpha` · Preuves : `tests/reports/run45719798169/`,
+> `run45772086234/`.
 
 > Phase 1 (conception) : dossier complet dans `docs/` — vérifié le 25/11/2026.
 
