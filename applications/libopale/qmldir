@@ -1,0 +1,4 @@
+module org.hybridos.opale
+singleton OpaleTheme 1.0 OpaleTheme.qml
+OpaleButton 1.0 OpaleButton.qml
+OpaleCard 1.0 OpaleCard.qml

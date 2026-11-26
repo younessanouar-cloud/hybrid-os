@@ -14,9 +14,9 @@
 | `system/boot/` | GRUB, entrées, récupération de boot (doc 04) | 🕳 Vide — Phase 2/3 |
 | `system/security/` | SELinux policies custom, LUKS/TPM (doc 06) | 🕳 Vide — Phase 3 |
 | `system/services/` | Services systemd HYBRID | 🕳 Vide — Phase 2/3 |
-| `desktop/` | HYBRID Desktop (Plasma + OPALE, doc 07) | 🕳 Vide — Phase 2 |
+| `desktop/` | HYBRID Desktop (Plasma + OPALE, doc 07) | 🟡 **Actif (Phase 2)** — disposition par défaut (`layout.js` dans le look-and-feel) ; composants dock/lanceur custom = Phase 2+ |
 | `desktop/shell/` `dock/` `launcher/` `notifications/` `settings/` | Composants du bureau | 🕳 Vide — Phase 2 |
-| `applications/` | Applications natives Kirigami | 🕳 Vide — Phase 3/4 |
+| `applications/` | Applications natives Kirigami | 🟡 **Actif (Phase 2)** — `libopale/` : bibliothèque QML de composants OPALE (OpaleTheme tokens + OpaleButton + OpaleCard), socle des apps Phase 3-4 |
 | `applications/security-center/` | Hybrid Security Center (doc 06) | 🕳 Vide — Phase 3 |
 | `applications/app-store/` | Hybrid Store (doc 02) | 🕳 Vide — Phase 4 |
 | `applications/file-manager/` | Intégration explorateur | 🕳 Vide — Phase 4 |

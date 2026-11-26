@@ -128,10 +128,19 @@ des charges), pas en option ultérieure.
 
 ## 9. Statut — ce qui existe / ce qui reste à produire
 
-- **Existe aujourd'hui** : direction, tokens, palette (mesurée sur la
-  maquette), règles d'accessibilité — **ce document**.
-- **À produire en Phase 2** : logo (5 déclinaisons), icônes, thèmes Plasma
-  complets, bibliothèque QML, maquettes par application (Store, Security
-  Center, Paramètres…).
+- **Existe aujourd'hui** (Phase 2, 26/11/2026) : tokens + palette (mesurée sur
+  la maquette), règles d'accessibilité, **logo « opale facettée » 5 déclinaisons
+  (script reproductible)**, wallpaper 4K, palette KDE `HybridOpale.colors`,
+  look-and-feel avec **KSplash QML branché sur les vraies étapes de démarrage**,
+  **thème SDDM OPALE**, **disposition du bureau** (`layout.js` : dock bas,
+  lanceur, tâches centrées, tray + horloge), **bibliothèque `libopale`**
+  (OpaleTheme/OpaleButton/OpaleCard) — socle des applications Phase 3-4.
+- **À produire** : icônes (jeu homogène dérivé OFL), thèmes KWin/plasma
+  desktoptheme complets, curseurs, maquettes par application, applications
+  natives (Store, Security Center, Paramètres…).
+- **Validation visuelle** : les rendus QML (KSplash/SDDM/bureau) exigent un
+  écran — à valider sur VM graphique / matériel en Phase 5. La CI prouve la
+  présence et le câblage ; **aucune capture d'écran ne sera présentée comme
+  preuve de rendu tant que le rendu réel n'aura pas été constaté** (règle §12).
 - **Interdiction permanente** (règle §12) : aucune capture d'écran d'une
   maquette ne sera présentée comme capture du système réel.
