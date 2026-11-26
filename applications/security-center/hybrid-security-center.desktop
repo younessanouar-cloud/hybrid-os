@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=HYBRID Security Center
+Name[fr]=HYBRID Centre de sécurité
+Comment=État de sécurité du système (SELinux, pare-feu, Secure Boot — sources réelles)
+Comment[fr]=État de sécurité du système (SELinux, pare-feu, Secure Boot — sources réelles)
+Exec=hybrid-security-center
+Icon=hybridos
+Terminal=false
+Categories=System;Security;
+StartupWMClass=hybrid-security-center

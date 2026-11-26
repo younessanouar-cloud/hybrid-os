@@ -1,15 +1,24 @@
-# HYBRID OS — couche Desktop v0 (Alpha 0.1, étape 3)
 # =====================================================================
-# Contenu v0 (honnêteté — plan docs/10 étape 3) :
-#   1. Localisation française (langpacks + hunspell)
-#   2. Fond d'écran OPALE « Opale nuit » (script reproductible seed 42)
-#   3. Palette système OPALE (HybridOpale.colors)
-#   4. Look-and-feel minimal OPALE (defaults) sélectionné par défaut
-# Ce que v0 ne fait PAS : dock custom, lanceur, KSplash custom, thèmes
-# KWin/icônes complets — Phase 2 (doc 07 §9). Rien de simulé.
-# Base figée par digest dans build/manifest.yaml (jamais de tag flottant).
+# HYBRID OS — image desktop (Phase 2/3)
+# Structure MULTI-STAGE :
+#   - stage « builder » : toolchain C++ (jamais dans l'image finale)
+#   - stage final : l'image bootc avec l'identité OPALE + les apps natives
 # =====================================================================
+
+# ----- Stage 1 : compilation des applications natives -----
 ARG BASE_IMAGE="quay.io/fedora/fedora-kinoite:45"
+FROM ${BASE_IMAGE} AS builder
+
+RUN dnf -y install gcc-c++ cmake qt6-qtdeclarative-devel \
+    && dnf clean all
+
+# Security Center (Phase 3 ébauche — sources réelles, doc 06)
+COPY applications/security-center /src/security-center
+RUN cmake -S /src/security-center -B /src/build -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build /src/build --parallel \
+    && cmake --install /src/build --prefix /inst
+
+# ----- Stage 2 : image finale bootc -----
 FROM ${BASE_IMAGE}
 
 # --- 1. Localisation française ---
@@ -44,10 +53,15 @@ COPY applications/libopale/ \
 COPY branding/opale/icons/hicolor/ \
      /usr/share/icons/hicolor/
 
+# --- 8. Application native : Security Center (compilée au stage 1) ---
+COPY --from=builder /inst/bin/hybrid-security-center /usr/bin/
+COPY applications/security-center/hybrid-security-center.desktop \
+     /usr/share/applications/
+
 LABEL org.opencontainers.image.title="HYBRID OS desktop" \
-      org.opencontainers.image.description="HYBRID OS desktop — Fedora Kinoite (Atomic KDE) + design system OPALE : wallpaper, palette, KSplash QML, SDDM, disposition du bureau, locale FR" \
+      org.opencontainers.image.description="HYBRID OS desktop — Fedora Kinoite (Atomic KDE) + design system OPALE complet + Security Center natif (sources réelles)" \
       org.opencontainers.image.vendor="HYBRID OS Project" \
       org.opencontainers.image.licenses="ASL-2.0 AND BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT" \
       org.opencontainers.image.base.name="quay.io/fedora/fedora-kinoite:45" \
-      org.hybridos.version="0.2.0-alpha.1" \
-      org.hybridos.phase="phase2-interface"
+      org.hybridos.version="0.3.0-alpha.1" \
+      org.hybridos.phase="phase2-3-interface-securite"
