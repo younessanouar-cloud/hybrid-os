@@ -122,7 +122,7 @@ jobs:
   publish-and-sign:
     name: "Publier + signer l'image desktop (GHCR)"
     needs: build-and-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -196,7 +196,7 @@ jobs:
   build-iso:
     name: "Générer l'ISO installable (anaconda-iso)"
     needs: [build-and-test, publish-and-sign]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
@@ -272,7 +272,7 @@ jobs:
   vm-smoke:
     name: "Smoke boot VM (QEMU TCG + UEFI OVMF)"
     needs: build-iso
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -312,5 +312,64 @@ jobs:
             tests/reports/smoke-boot-serial.log
             tests/reports/qemu-stderr.log
           retention-days: 90
+
+  # ==================================================================
+  # ÉTAPE 7 (plan Alpha 0.1, docs/10) — installation kickstart + mesures
+  # Durée : plusieurs heures en TCG → déclenchement MANUEL uniquement
+  # (workflow_dispatch) pour ne pas consommer un runner à chaque push.
+  # Prouve : installation sur disque virtuel vierge via kickstart, boot
+  # du système installé, SELinux enforcing, méthode de mesure en place.
+  # ==================================================================
+  vm-install-measure:
+    name: "Installation kickstart + mesures (TCG, ~3-4 h)"
+    needs: build-iso
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Lire le manifeste figé"
+        id: manifest
+        run: |
+          set -euo pipefail
+          python3 -c "import yaml" 2>/dev/null || pip3 install --quiet pyyaml
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import yaml
+          m = yaml.safe_load(open('build/manifest.yaml'))
+          print(f"image_version={m['image']['version']}")
+          EOF
+
+      - name: "Télécharger l'ISO (générée par build-iso dans CE run)"
+        uses: actions/download-artifact@v4
+        with:
+          name: hybridos-alpha01-iso
+          path: iso/
+
+      - name: "Installer QEMU + OVMF + outils ISO + sshpass"
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qemu-system-x86 ovmf libarchive-tools sshpass
+
+      - name: "Installation kickstart + boot + mesures (doc 09 §3-5)"
+        run: |
+          set -euo pipefail
+          ISO_FILE=$(find iso -name "*.iso" -type f | head -1)
+          [ -n "$ISO_FILE" ] || { echo "Aucune ISO dans l'artefact"; exit 1; }
+          bash tests/vm/install_vm.sh "$ISO_FILE" 9000 3600 4096 40
+
+      - name: "Archiver les rapports (même en échec)"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-measure-reports
+          path: |
+            tests/reports/install-measure-report.txt
+            tests/reports/install-serial.log
+            tests/reports/boot-installed-serial.log
+          retention-days: 90
+
 
 
