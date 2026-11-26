@@ -181,12 +181,19 @@ if [ "${CAPTURE:-0}" = "1" ]; then
   command -v socat >/dev/null || fail "socat absent — apt install socat"
   mkdir -p tests/reports/captures
   N=0
-  for ATTENTE in 60 60 120 120 180 180 240; do
+  # Fenêtre étendue (~38 min) : graphical.target/SDDM est LENT en TCG.
+  # Diagnostic en direct : état sddm interrogé par SSH à chaque tour.
+  for ATTENTE in 120 180 180 240 300 300 300 300 300 300 300; do
     sleep "$ATTENTE"
     N=$((N+1))
     SHOT="$WORK/shot-$N.ppm"
     echo "screendump $SHOT" | socat - UNIX-CONNECT:"$WORK/qemu-mon.sock" 2>/dev/null || true
-    echo "capture $N prise (attente cumulée ~$((60+60+120+120+180+180+240))s max)"
+    # État réel du greeter (distingue « lent » de « défaillant »)
+    ETAT=$(sshpass -p hybrios01 ssh -o StrictHostKeyChecking=no \
+           -o UserKnownHostsFile=/dev/null -p 2222 hybride@127.0.0.1 \
+           'echo sddm=$(systemctl is-active sddm 2>/dev/null) graphical=$(systemctl is-active graphical.target 2>/dev/null)' \
+           2>/dev/null || echo "ssh-ko")
+    echo "capture $N : $ETAT"
   done
   kill "$QEMU_PID" 2>/dev/null || true; QEMU_PID=""
 

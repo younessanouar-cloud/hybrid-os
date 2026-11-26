@@ -1,0 +1,27 @@
+=== HYBRID OS — rapport installation & mesures (VM QEMU TCG) ===
+Date (UTC)          : 2026-11-26 19:53:47
+ISO                 : iso/bootiso/install.iso
+Phase B installation: 2070s (TCG)
+Phase C jusqu'à SSH  : 15s (TCG — émulation, PAS représentatif du matériel)
+
+--- Identité du système installé ---
+7.3.4-300.fc45.x86_64
+Fedora release 45 (Forty Five)
+
+--- Sécurité (critères doc 09) ---
+SELinux (attendu Enforcing) : Current mode:                   enforcing
+
+--- Mesures (TCG = base reproductible, pas du matériel réel) ---
+--- RAM au repos (free -m) ---
+               total        used        free      shared  buff/cache   available
+Mem:            3891         467        3456          12         189        3424
+Swap:           3890           0        3890
+--- systemd-analyze ---
+Startup finished in 4.648s (kernel) + 16.080s (initrd) + 33.149s (userspace) = 53.878s 
+multi-user.target reached after 32.666s in userspace.
+--- uptime ---
+ 19:54:06 up 1 min,  1 user,  load average: 2.13, 0.73, 0.26
+--- bootc status (extrait) ---
+
+Rappel honnêteté : mesures en émulation TCG. Objectifs cahier des charges
+(RAM ≤ 1,8 Go, boot ≤ 20 s) : à mesurer sur machine de référence (doc 09 §3).
