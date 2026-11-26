@@ -103,10 +103,6 @@ jobs:
                      /usr/share/plasma/look-and-feel/com.hybridos.opale/contents/splash/Main.qml \
                      /usr/share/plasma/look-and-feel/com.hybridos.opale/contents/splash/images/opale.png \
                      /usr/share/plasma/look-and-feel/com.hybridos.opale/contents/layouts/org.kde.plasma.desktop-layout.js \
-                     /usr/share/sddm/themes/hybridos-opale/Main.qml \
-                     /usr/share/sddm/themes/hybridos-opale/images/opale.png \
-                     /usr/share/sddm/themes/hybridos-opale/metadata.desktop \
-                     /etc/sddm.conf.d/hybridos.conf \
                      /etc/xdg/kdeglobals; do
               echo -n "$f : "
               podman run --rm "$IMG" test -f "$f" && echo "PRÉSENT" || echo "ABSENT"

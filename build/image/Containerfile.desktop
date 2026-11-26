@@ -40,10 +40,12 @@ COPY branding/opale/look-and-feel/com.hybridos.opale/ \
      /usr/share/plasma/look-and-feel/com.hybridos.opale/
 COPY build/kdeglobals.hybridos /etc/xdg/kdeglobals
 
-# --- 5. Écran de connexion SDDM OPALE ---
-COPY branding/opale/sddm/hybridos-opale/ \
-     /usr/share/sddm/themes/hybridos-opale/
-COPY branding/opale/sddm/hybridos.conf /etc/sddm.conf.d/hybridos.conf
+# --- 5. Écran de connexion : Kinoite 45 utilise PLASMA LOGIN (plasmalogin)
+#     comme display-manager (découverte du 26/11 : display-manager.service
+#     → plasmalogin.service — SDDM absent par défaut). Plasma Login se
+#     thème via le look-and-feel (com.hybridos.opale ✓ section 4).
+#     Le thème SDDM OPALE reste conservé dans branding/opale/sddm/ pour
+#     une éventuelle variante « sddm » — non embarqué par défaut.
 
 # --- 6. Bibliothèque de composants OPALE (apps natives — doc 07 §6) ---
 COPY applications/libopale/ \
@@ -58,13 +60,10 @@ COPY --from=builder /inst/bin/hybrid-security-center /usr/bin/
 COPY applications/security-center/hybrid-security-center.desktop \
      /usr/share/applications/
 
-# --- 9. Mode graphique : greeter SDDM (ABSENT de l'image OCI amont —
-#     pattern des dérivées bootc : installer le greeter explicitement) ---
-#     SYSTEMD_OFFLINE=1 : systemctl offline dans un conteneur sans bus.
-RUN dnf -y install sddm sddm-kcm \
-    && SYSTEMD_OFFLINE=1 systemctl enable sddm.service \
-    && SYSTEMD_OFFLINE=1 systemctl set-default graphical.target \
-    && dnf clean all
+# --- 9. Mode graphique : la cible par défaut est forcée (le kickstart
+#     texte bascule le système en console sinon). Le greeter natif
+#     (plasmalogin) est déjà enabled dans l'image amont — rien à installer.
+RUN SYSTEMD_OFFLINE=1 systemctl set-default graphical.target
 
 LABEL org.opencontainers.image.title="HYBRID OS desktop" \
       org.opencontainers.image.description="HYBRID OS desktop — Fedora Kinoite (Atomic KDE) + design system OPALE complet + Security Center natif (sources réelles)" \
