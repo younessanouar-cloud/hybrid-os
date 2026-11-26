@@ -58,11 +58,13 @@ COPY --from=builder /inst/bin/hybrid-security-center /usr/bin/
 COPY applications/security-center/hybrid-security-center.desktop \
      /usr/share/applications/
 
-# --- 9. Mode graphique EXPLICITE (le kickstart texte installe en console) ---
-# Pattern bootc documenté : systemctl enable/set-default fonctionne offline
-# dans le build d'image ; garanti SDDM actif + cible graphical au premier boot.
-RUN systemctl enable sddm.service \
-    && systemctl set-default graphical.target
+# --- 9. Mode graphique : greeter SDDM (ABSENT de l'image OCI amont —
+#     pattern des dérivées bootc : installer le greeter explicitement) ---
+#     SYSTEMD_OFFLINE=1 : systemctl offline dans un conteneur sans bus.
+RUN dnf -y install sddm sddm-kcm \
+    && SYSTEMD_OFFLINE=1 systemctl enable sddm.service \
+    && SYSTEMD_OFFLINE=1 systemctl set-default graphical.target \
+    && dnf clean all
 
 LABEL org.opencontainers.image.title="HYBRID OS desktop" \
       org.opencontainers.image.description="HYBRID OS desktop — Fedora Kinoite (Atomic KDE) + design system OPALE complet + Security Center natif (sources réelles)" \
