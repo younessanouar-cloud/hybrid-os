@@ -9,7 +9,7 @@
 
 | Composant | Version courante constatée (nov. 2026) | Licence | Statut |
 |---|---|---|---|
-| Fedora (base Atomic) | **Fedora 45** — tag stable courant de `quay.io/fedora/fedora-kinoite`, figé par digest le 25/11/2026 (API quay) ; versions constatées dans notre image (rapport CI) : kernel 7.3.4-300.fc45, Plasma 6.8.3, bootc 1.17.1, SELinux policy 45.24 | Licences Fedora (GPL, MIT,…) | ✅ figée + vérifiée |
+| Fedora (base Atomic) | **Fedora 45** — tag stable courant de `quay.io/fedora/fedora-kinoite`, figé par digest le 25/11/2026 (API quay) ; versions constatées dans notre image (rapport CI) : kernel 7.3.4-300.fc45, Plasma 6.8.3, bootc 1.17.1, SELinux policy 45.24. **Rebase 26/11/2026** : l'amont a mis à jour le tag 45 (l'ancien digest a été retiré par le GC de quay) → manifeste mis à jour vers le nouveau digest + fenêtre de tests complète relancée — le contrôleur de dérive CI a détecté et signalé l'écart exact | Licences Fedora (GPL, MIT,…) | ✅ figée + vérifiée, rebase documenté |
 | Image de base OCI | `quay.io/fedora/fedora-bootc` (officielle, KDE en variante desktop) ou image Kinoite selon disponibilité exacte au build | idem | ⚠️ choisir + figer digest |
 | Noyau Linux | **7.3.4-300.fc45** constaté (rapport CI 25/11/2026) | GPLv2 | ✅ vérifié |
 | bootc | outil de déploiement d'images OCI bootables (amont Fedora, « Image Mode Phase 2 ») | Apache-2.0/MIT | ✅ |

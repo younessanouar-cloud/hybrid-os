@@ -14,14 +14,23 @@ base:
   repository: fedora/fedora-kinoite
   tag: "45"
   # Digest du manifest-list (multi-arch) au moment du figeage :
-  digest: "sha256:79f701ea3702d905ca3c48efd8f9594987d3f23db5f17c5e8395a6f5d1335da0"
+  #   - 2026-11-25 : sha256:79f701ea… (supprimé par le GC de quay après la
+  #     mise à jour amont du 26/11 — l'ancien manifest n'est plus servi)
+  #   - 2026-11-26 (rebase) : sha256:72c24fe77ec6f541529c6db4ff38f91b7f0b3a23072ee8e145b37fde6b1b167d
+  digest: "sha256:72c24fe77ec6f541529c6db4ff38f91b7f0b3a23072ee8e145b37fde6b1b167d"
   arch_target: x86_64        # cible v1 (doc 02) — aarch64 également publié par l'amont
-  verified_at: "2026-11-25"
+  verified_at: "2026-11-26"
   notes: >
     Fedora Kinoite = Atomic Desktop officiel KDE de Fedora, géré bootc
     (Image Mode). La CI construit TOUJOURS par digest (reproductibilité) ;
     un contrôleur de dérive compare le tag vivant au digest figé et alerte
-    quand l'amont avance (fenêtre de rebase, doc 09).
+    quand l'amont avance (fenêtre de rebase, doc 09). REBASE du 26/11 :
+    l'amont a mis à jour le tag 45 (nouveau digest ci-dessus) et le GC de
+    quay a retiré l'ancien manifest → mise à jour du présent manifeste,
+    suivie de la relance de la fenêtre de tests complète (doc 09).
+    RÈGLE DE VIE DU PROJET : les images amont Fedora sont mises à jour
+    régulièrement ; le rebase est une opération NORMALE du cycle de
+    maintenance (elle suit les correctifs de sécurité Fedora).
 
 image:
   name: hybridos/base
