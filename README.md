@@ -1,7 +1,11 @@
 # HYBRID OS — Distribution hybride nouvelle génération
 
-> **Statut : Phase 1 — Dossier de conception soumis à validation. Aucun code système produit à ce stade.**
-> Dernière vérification des technologies : 25 novembre 2026.
+> **Statut : Alpha 0.1 ATTEINT (26/11/2026) — ISO amorçable construite de façon
+> reproductible et bootée en VM UEFI. Preuves : `tests/reports/run45719798169/`.**
+> Validation client du jalon en cours — ensuite : mesures, installation
+> automatisée, puis Phase 2 (interface complète OPALE).
+
+> Phase 1 (conception) : dossier complet dans `docs/` — vérifié le 25/11/2026.
 
 HYBRID OS est un système d'exploitation hybride destiné au grand public et aux
 professionnels : l'ergonomie de Windows et macOS, la liberté et la sécurité de

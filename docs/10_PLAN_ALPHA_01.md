@@ -35,10 +35,10 @@
 | 2 | Manifeste des versions (base figée) + `Containerfile` HYBRID v0 | Image OCI `hybridos/base` | ✅ **VALIDÉE** — bootc 1.17.1 opérationnel en conteneur CI |
 | 3 | Couche KDE + branding OPALE v0 (fond, couleurs, KSplash simple, paquets de base FR) | Image `hybridos/desktop` | ✅ **VALIDÉE** — Plasma 6.8.3, locale FR, branding OPALE 4/4 fichiers PRÉSENTS (rapport artefact) |
 | 4 | Signature cosign (clé de test, hors dépôt) + publication registre GHCR | Image signée | Vérification `cosign verify` en CI |
-| 5 | Génération ISO via `bootc-image-builder` (`anaconda-iso`) + artefact CI téléchargeable | ISO Alpha 0.1 | Artefact présent + hash SHA256 publié |
-| 6 | Test VM documenté (local : smoke ; CI : scripts sériels) : boot → install → reboot | Rapport de test n°1 (commandes + sorties) | Tous les critères §7 du doc 09 |
-| 7 | Mesures initiales (RAM, boot) vs Fedora référence | `tests/reports/alpha01-perf` | Méthode du doc 09 respectée |
-| 8 | Retour d'expérience + correction + tag `v0.1.0-alpha` | Note de jalon + release | **Validation client du jalon** |
+| 5 | Génération ISO via `bootc-image-builder` (`anaconda-iso`) + artefact CI téléchargeable | ISO Alpha 0.1 + SHA256 publié | ✅ **VALIDÉE** — run 45719798169 : ISO `install.iso`, SHA256 `10bda05f…` (4 fixes documentés : storage monté, pre-pull, `--rootfs xfs`, chemins) |
+| 6 | Test VM documenté : boot de l'ISO en UEFI/OVMF (QEMU TCG) | Rapport de test + trace série | ✅ **VALIDÉE (amorçage)** — noyau 7.2.11-300.fc45 + systemd + Anaconda atteints ; preuve archivée `tests/reports/run45719798169/BOOT_PROOF.md` (l'installation complète sur disque = suite du plan) |
+| 7 | Mesures initiales (RAM, boot) vs Fedora référence | `tests/reports/alpha01-perf` | ⏳ À faire |
+| 8 | Retour d'expérience + correction + tag `v0.1.0-alpha` | Note de jalon + release | ⏳ En cours — **validation client du jalon demandée** |
 
 ## Critères de succès (tous obligatoires)
 
