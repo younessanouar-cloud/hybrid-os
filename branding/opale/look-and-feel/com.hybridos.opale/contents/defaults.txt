@@ -3,3 +3,7 @@ ColorScheme=HybridOpale
 
 [plasmarc][Wallpaper][org.kde.image]
 Image=file:///usr/share/wallpapers/OpaleNuit/contents/images/3840x2160.png
+
+[ksplashrc][KSplash]
+Engine=KSplashQML
+Theme=com.hybridos.opale

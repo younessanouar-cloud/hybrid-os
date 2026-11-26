@@ -89,10 +89,18 @@ jobs:
             echo -n "selinux-policy    : "; podman run --rm "$IMG" rpm -q selinux-policy-targeted
             echo -n "glibc-langpack-fr : "; podman run --rm "$IMG" rpm -q glibc-langpack-fr
             echo ""
-            echo "--- Branding OPALE embarqué (fichiers attendus) ---"
+            echo "--- Branding OPALE embarqué (fichiers attendus — Phase 2) ---"
             for f in /usr/share/wallpapers/OpaleNuit/contents/images/3840x2160.png \
                      /usr/share/color-schemes/HybridOpale.colors \
                      /usr/share/plasma/look-and-feel/com.hybridos.opale/metadata.json \
+                     /usr/share/plasma/look-and-feel/com.hybridos.opale/contents/defaults.txt \
+                     /usr/share/plasma/look-and-feel/com.hybridos.opale/contents/splash/Main.qml \
+                     /usr/share/plasma/look-and-feel/com.hybridos.opale/contents/splash/images/opale.png \
+                     /usr/share/plasma/look-and-feel/com.hybridos.opale/contents/layouts/org.kde.plasma.desktop-layout.js \
+                     /usr/share/sddm/themes/hybridos-opale/Main.qml \
+                     /usr/share/sddm/themes/hybridos-opale/images/opale.png \
+                     /usr/share/sddm/themes/hybridos-opale/metadata.desktop \
+                     /etc/sddm.conf.d/hybridos.conf \
                      /etc/xdg/kdeglobals; do
               echo -n "$f : "
               podman run --rm "$IMG" test -f "$f" && echo "PRÉSENT" || echo "ABSENT"

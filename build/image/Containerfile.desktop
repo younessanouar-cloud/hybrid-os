@@ -26,15 +26,20 @@ COPY branding/opale/wallpapers/metadata.desktop \
 COPY branding/opale/colors/HybridOpale.colors \
      /usr/share/color-schemes/HybridOpale.colors
 
-# --- 4. Look-and-feel minimal OPALE + sélection par défaut ---
+# --- 4. Look-and-feel OPALE (thèmes, splash, disposition bureau) ---
 COPY branding/opale/look-and-feel/com.hybridos.opale/ \
      /usr/share/plasma/look-and-feel/com.hybridos.opale/
 COPY build/kdeglobals.hybridos /etc/xdg/kdeglobals
 
+# --- 5. Écran de connexion SDDM OPALE ---
+COPY branding/opale/sddm/hybridos-opale/ \
+     /usr/share/sddm/themes/hybridos-opale/
+COPY branding/opale/sddm/hybridos.conf /etc/sddm.conf.d/hybridos.conf
+
 LABEL org.opencontainers.image.title="HYBRID OS desktop" \
-      org.opencontainers.image.description="HYBRID OS v0 desktop — Fedora Kinoite (Atomic KDE) + branding OPALE (fond, palette, look-and-feel minimal, locale FR)" \
+      org.opencontainers.image.description="HYBRID OS desktop — Fedora Kinoite (Atomic KDE) + design system OPALE : wallpaper, palette, KSplash QML, SDDM, disposition du bureau, locale FR" \
       org.opencontainers.image.vendor="HYBRID OS Project" \
       org.opencontainers.image.licenses="ASL-2.0 AND BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT" \
       org.opencontainers.image.base.name="quay.io/fedora/fedora-kinoite:45" \
-      org.hybridos.version="0.1.0-alpha.1" \
-      org.hybridos.phase="alpha-0.1-step3"
+      org.hybridos.version="0.2.0-alpha.1" \
+      org.hybridos.phase="phase2-interface"

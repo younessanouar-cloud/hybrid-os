@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=HYBRID Opale
+Name[fr]=HYBRID Opale
+Description=Écran de connexion HYBRID OS — design system OPALE (fond bleu nuit, gemme opale, accent spectral)
+Description[fr]=Écran de connexion HYBRID OS — design system OPALE
+Author=HYBRID OS Project
+Website=https://github.com/younessanouar-cloud/hybrid-os
+License=CC-BY-SA-4.0
+Theme-Id=hybridos-opale
+Theme-QtVersion=6
