@@ -191,7 +191,7 @@ if [ "${CAPTURE:-0}" = "1" ]; then
     # État réel du greeter (distingue « lent » de « défaillant »)
     ETAT=$(sshpass -p hybrios01 ssh -o StrictHostKeyChecking=no \
            -o UserKnownHostsFile=/dev/null -p 2222 hybride@127.0.0.1 \
-           'echo sddm=$(systemctl is-active sddm 2>/dev/null) graphical=$(systemctl is-active graphical.target 2>/dev/null)' \
+           'echo sddm=$(systemctl is-active sddm 2>/dev/null) graphical=$(systemctl is-active graphical.target 2>/dev/null) enabled=$(systemctl is-enabled sddm 2>/dev/null) default=$(systemctl get-default 2>/dev/null)' \
            2>/dev/null || echo "ssh-ko")
     echo "capture $N : $ETAT"
   done
