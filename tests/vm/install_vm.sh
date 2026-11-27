@@ -188,11 +188,11 @@ if [ "${CAPTURE:-0}" = "1" ]; then
     N=$((N+1))
     SHOT="$WORK/shot-$N.ppm"
     echo "screendump $SHOT" | socat - UNIX-CONNECT:"$WORK/qemu-mon.sock" 2>/dev/null || true
-    # État réel du greeter (alias standard display-manager = valable
-    # pour tout greeter : plasmalogin sur Kinoite 45, sddm si variante)
+    # État réel du greeter + faits sur le système installé (v7 : après
+    # création explicite de l'alias dans le %post)
     ETAT=$(sshpass -p hybrios01 ssh -o StrictHostKeyChecking=no \
            -o UserKnownHostsFile=/dev/null -p 2222 hybride@127.0.0.1 \
-           'echo dm=$(systemctl is-active display-manager 2>/dev/null) graphical=$(systemctl is-active graphical.target 2>/dev/null) enabled=$(systemctl is-enabled display-manager 2>/dev/null) default=$(systemctl get-default 2>/dev/null)' \
+           'echo dm=$(systemctl is-active display-manager 2>/dev/null) enabled=$(systemctl is-enabled display-manager 2>/dev/null) default=$(systemctl get-default 2>/dev/null); ls -la /etc/systemd/system/display-manager.service 2>&1 | head -1; rpm -q kde-settings-plasmalogin plasma-workspace 2>&1 | head -2' \
            2>/dev/null || echo "ssh-ko")
     echo "capture $N : $ETAT"
   done

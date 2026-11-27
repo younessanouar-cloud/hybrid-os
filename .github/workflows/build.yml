@@ -343,7 +343,7 @@ jobs:
   vm-install-measure:
     name: "Installation kickstart + mesures (TCG, ~3-4 h)"
     needs: build-iso
-    if: github.event_name == 'workflow_dispatch' && inputs.scenario != 'capture'
+    if: github.event_name == 'workflow_dispatch' && inputs.scenario == 'full'
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     steps:
