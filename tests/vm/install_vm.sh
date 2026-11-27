@@ -225,6 +225,12 @@ if [ "${CAPTURE:-0}" = "1" ]; then
            -o UserKnownHostsFile=/dev/null -p 2222 hybride@127.0.0.1 \
            'echo dm=$(systemctl is-active display-manager 2>/dev/null) enabled=$(systemctl is-enabled display-manager 2>/dev/null) default=$(systemctl get-default 2>/dev/null); ls -la /etc/systemd/system/display-manager.service 2>&1 | head -1; rpm -q kde-settings-plasmalogin plasma-workspace 2>&1 | head -2' \
            2>/dev/null || echo "ssh-ko")
+    # Journal du first-setup OPALE (v10 : sortie NON masquée)
+    FIRSTSETUP_LOG=$(sshpass -p hybrios01 ssh -o StrictHostKeyChecking=no \
+           -o UserKnownHostsFile=/dev/null -p 2222 hybride@127.0.0.1 \
+           'cat ~/.config/opale-firstsetup.log 2>/dev/null; echo "--- autostart welcome ---"; ls /etc/xdg/autostart/ 2>/dev/null | grep -iE "welcome|hybrid"' \
+           2>/dev/null || echo "lecture impossible")
+    echo "$FIRSTSETUP_LOG" | tail -30
     echo "capture $N : $ETAT"
   done
   kill "$QEMU_PID" 2>/dev/null || true; QEMU_PID=""
