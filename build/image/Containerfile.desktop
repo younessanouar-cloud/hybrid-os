@@ -18,6 +18,12 @@ RUN cmake -S /src/security-center -B /src/build -DCMAKE_BUILD_TYPE=Release \
     && cmake --build /src/build --parallel \
     && cmake --install /src/build --prefix /inst
 
+# OPALE Showcase (galerie du design system — Phase 2)
+COPY applications/showcase /src/showcase
+RUN cmake -S /src/showcase -B /src/build-showcase -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build /src/build-showcase --parallel \
+    && cmake --install /src/build-showcase --prefix /inst
+
 # ----- Stage 2 : image finale bootc -----
 FROM ${BASE_IMAGE}
 
@@ -55,9 +61,12 @@ COPY applications/libopale/ \
 COPY branding/opale/icons/hicolor/ \
      /usr/share/icons/hicolor/
 
-# --- 8. Application native : Security Center (compilée au stage 1) ---
+# --- 8. Applications natives (compilées au stage 1) ---
 COPY --from=builder /inst/bin/hybrid-security-center /usr/bin/
 COPY applications/security-center/hybrid-security-center.desktop \
+     /usr/share/applications/
+COPY --from=builder /inst/bin/hybrid-showcase /usr/bin/
+COPY applications/showcase/hybrid-showcase.desktop \
      /usr/share/applications/
 
 # --- 9. Mode graphique : la cible par défaut est forcée (le kickstart

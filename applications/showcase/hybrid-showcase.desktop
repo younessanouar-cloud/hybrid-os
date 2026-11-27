@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=OPALE Showcase
+Name[fr]=OPALE — Galerie du design system
+Comment=Galerie des composants du design system HYBRID OS
+Comment[fr]=Galerie des composants du design system HYBRID OS
+Exec=hybrid-showcase
+Icon=hybridos
+Terminal=false
+Categories=System;Utility;
+StartupWMClass=hybrid-showcase
