@@ -60,19 +60,50 @@ for f in /usr/share/OVMF/OVMF_VARS_4M.fd /usr/share/OVMF/OVMF_VARS.fd; do
 [ -n "$OVMF_CODE" ] && [ -n "$OVMF_VARS_SRC" ] || fail "OVMF absent — apt install ovmf"
 cp "$OVMF_VARS_SRC" "$WORK/vars-install.fd"; cp "$OVMF_VARS_SRC" "$WORK/vars-boot.fd"
 
-echo "== Extraction noyau/initrd de l'ISO =="
-bsdtar -xf "$ISO" -C "$WORK" images/pxeboot/vmlinuz images/pxeboot/initrd.img EFI/BOOT/grub.cfg \
+echo "== Extraction noyau/initrd/osbuild.ks de l'ISO =="
+bsdtar -xf "$ISO" -C "$WORK" images/pxeboot/vmlinuz images/pxeboot/initrd.img EFI/BOOT/grub.cfg osbuild.ks \
   || fail "extraction impossible (structure ISO)"
 KERNEL="$WORK/images/pxeboot/vmlinuz"; INITRD="$WORK/images/pxeboot/initrd.img"
 STAGE2_LINE=$(grep -m1 -E '^[[:space:]]*linux' "$WORK/EFI/BOOT/grub.cfg" | head -1)
 APPEND_BASE=$(echo "$STAGE2_LINE" | awk '{for(i=3;i<=NF;i++) printf "%s ", $i}' | sed 's/\bquiet\b//')
-APPEND_INSTALL="${APPEND_BASE} inst.ks=http://10.0.2.2:8000/ks-alpha01.cfg inst.text console=ttyS0,115200"
+
+# --- v8 : kickstart FINAL = osbuild.ks officiel (installe l'image embarquée)
+#     + nos overrides (comptes, services, %post greeter). JAMAIS de kickstart
+#     sans la directive bootc/ostreecontainer (sinon installation RPM minimale
+#     sans bureau — constaté run 46044658628 : plasma-workspace absent).
+OSBUILD_KS="$WORK/osbuild.ks"
+if [ ! -f "$OSBUILD_KS" ]; then
+  # essai d'autres chemins usuels de l'ISO
+  bsdtar -xf "$ISO" -C "$WORK" images/product.img 2>/dev/null || true
+  OSBUILD_KS=""
+  for cand in osbuild.ks ks.cfg ks/osbuild.ks; do
+    [ -f "$WORK/$cand" ] && OSBUILD_KS="$WORK/$cand" && break
+  done
+  [ -n "$OSBUILD_KS" ] || fail "osbuild.ks introuvable dans l'ISO — STRUCTURE À EXPLORER (voir bsdtar -tf)"
+fi
+echo "== Contenu osbuild.ks (kickstart officiel de l'ISO — preuve) =="
+grep -n -E "^(text|graphical|bootc|ostree|network|clearpart|part |user |rootpw|services|reboot|zerombr)" "$OSBUILD_KS" | head -25 || true
+cat "$OSBUILD_KS" > "$WORK/ks-hybrid-final.cfg"
+APPEND_INSTALL="${APPEND_BASE} inst.ks=http://10.0.2.2:8000/ks-final.cfg inst.text console=ttyS0,115200"
 echo "Paramètres install : $APPEND_INSTALL"
 
 qemu-img create -f qcow2 "$WORK/disk.qcow2" "${DISK_GB}G" >/dev/null
 
-# Kickstart servi par l'hôte (10.0.2.2 = hôte vu depuis QEMU user networking)
-cp tests/vm/ks-alpha01.cfg "$WORK/"
+# --- Kickstart v8 : osbuild.ks officiel (installe l'image embarquée)
+#     + overrides HYBRID (comptes, services, %post greeter). JAMAIS de
+#     kickstart sans la directive bootc/ostreecontainer — sinon installation
+#     RPM minimale sans bureau (constaté run 46044658628 : plasma-workspace
+#     absent du système installé, plasma-workspace présent dans l'image).
+{
+  echo "text"
+  echo "network --bootproto=dhcp --device=link --activate"
+  cat "$OSBUILD_KS"
+  cat tests/vm/ks-hybrid-overrides.cfg
+} > "$WORK/ks-final.cfg"
+echo "== Kickstart final (osbuild.ks + overrides) — lignes clés =="
+grep -n -E "^(text|graphical|bootc|ostree|user |rootpw|services|%post|reboot)" "$WORK/ks-final.cfg" | head -15 || true
+
+# Servi par l'hôte (10.0.2.2 = hôte vu depuis QEMU user networking)
 ( cd "$WORK" && python3 -m http.server 8000 >/dev/null 2>&1 ) &
 HTTP_PID=$!
 
