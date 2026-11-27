@@ -74,10 +74,20 @@ COPY applications/showcase/hybrid-showcase.desktop \
 #     (plasmalogin) est déjà enabled dans l'image amont — rien à installer.
 RUN SYSTEMD_OFFLINE=1 systemctl set-default graphical.target
 
+# --- 10. First setup OPALE par utilisateur (Phase 2 — doc 07 §6) ---
+#     Applique automatiquement le look-and-feel OPALE (couleurs, wallpaper
+#     OpaleNuit, layout dock, splash) à CHAQUE nouvelle session utilisateur
+#     + masque le wizard Plasma standard (constaté sur la capture réelle
+#     du run 46057328226 : "Welcome to Plasma Desktop" sans identité).
+COPY branding/opale/first-setup/first-setup.sh /usr/share/hybrid/first-setup.sh
+COPY branding/opale/autostart/hybrid-first-setup.desktop /etc/xdg/autostart/
+COPY branding/opale/autostart/org.kde.plasma-welcome.desktop /etc/xdg/autostart/
+RUN chmod +x /usr/share/hybrid/first-setup.sh
+
 LABEL org.opencontainers.image.title="HYBRID OS desktop" \
-      org.opencontainers.image.description="HYBRID OS desktop — Fedora Kinoite (Atomic KDE) + design system OPALE complet + Security Center natif (sources réelles)" \
+      org.opencontainers.image.description="HYBRID OS desktop — Fedora Kinoite (Atomic KDE) + design system OPALE complet + first setup automatique + Security Center natif (sources réelles)" \
       org.opencontainers.image.vendor="HYBRID OS Project" \
       org.opencontainers.image.licenses="ASL-2.0 AND BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT" \
       org.opencontainers.image.base.name="quay.io/fedora/fedora-kinoite:45" \
-      org.hybridos.version="0.3.0-alpha.1" \
-      org.hybridos.phase="phase2-3-interface-securite"
+      org.hybridos.version="0.3.1-alpha.1" \
+      org.hybridos.phase="phase2-firstsetup"
