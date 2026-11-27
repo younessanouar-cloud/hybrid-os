@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       scenario:
-        description: "full = installation + mesures · capture = idem + captures d'écran du bureau"
+        description: "full = installation + mesures · capture = idem + captures · probe = sonde image publiée"
         type: choice
-        options: [full, capture]
+        options: [full, capture, probe]
         default: full
 
 jobs:
@@ -391,8 +391,42 @@ jobs:
             tests/reports/boot-installed-serial.log
           retention-days: 90
 
-  # ==================================================================
-  # VALIDATION VISUELLE RÉELLE (règle §12 — levée par screendumps)
+  probe-image:
+    name: "Sonde image GHCR (diagnostic greeter, ~5 min)"
+    if: github.event_name == 'workflow_dispatch' && inputs.scenario == 'probe'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Lire le manifeste figé"
+        id: manifest
+        run: |
+          set -euo pipefail
+          python3 -c "import yaml" 2>/dev/null || pip3 install --quiet pyyaml
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import yaml
+          m = yaml.safe_load(open('build/manifest.yaml'))
+          print(f"image_version={m['image']['version']}")
+          EOF
+
+      - name: "Sonder l'image desktop publiée (faits, pas hypothèses)"
+        run: |
+          set -euo pipefail
+          IMAGE="ghcr.io/${{ github.repository_owner }}/hybridos:desktop-${{ steps.manifest.outputs.image_version }}"
+          echo "Image sondée : $IMAGE"
+          podman pull "$IMAGE"
+          echo "--- units plasmalogin / display-manager dans /usr/lib ---"
+          podman run --rm "$IMAGE" bash -c 'ls /usr/lib/systemd/system/ | grep -iE "plasmalogin|display-manager|sddm" || echo AUCUNE'
+          echo "--- symlink /etc/systemd/system/display-manager.service ---"
+          podman run --rm "$IMAGE" bash -c 'ls -la /etc/systemd/system/display-manager.service 2>/dev/null || echo ABSENT'
+          echo "--- paquets greeter installés ---"
+          podman run --rm "$IMAGE" bash -c 'rpm -qa | grep -iE "plasmalogin|sddm|plasma-workspace" | head -8 || echo AUCUN'
+          echo "--- binaires greeter ---"
+          podman run --rm "$IMAGE" bash -c 'ls /usr/lib/systemd/plasmalogin* /usr/bin/plasmalogin* /usr/bin/sddm* 2>/dev/null || echo AUCUN'
+          echo "--- cible par défaut dans l'image ---"
+          podman run --rm "$IMAGE" bash -c 'SYSTEMD_OFFLINE=1 systemctl get-default; ls -la /etc/systemd/system/default.target 2>/dev/null'
   # Même installation kickstart que vm-install-measure, PUIS captures
   # du framebuffer pendant que le système installé démarre vers
   # graphical.target (cible : l'écran SDDM OPALE rendu réellement).
