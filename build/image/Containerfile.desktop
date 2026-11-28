@@ -69,10 +69,24 @@ COPY --from=builder /inst/bin/hybrid-showcase /usr/bin/
 COPY applications/showcase/hybrid-showcase.desktop \
      /usr/share/applications/
 
-# --- 9. Mode graphique : la cible par défaut est forcée (le kickstart
-#     texte bascule le système en console sinon). Le greeter natif
-#     (plasmalogin) est déjà enabled dans l'image amont — rien à installer.
-RUN SYSTEMD_OFFLINE=1 systemctl set-default graphical.target
+# --- 9. Mode graphique : SDDM + autologin (v12 — choix pragmatique alpha) ---
+#     Kinoite 45 embarque Plasma Login (plasmalogin) comme greeter natif,
+#     MAIS sa configuration (thème/autologin) est trop récente et peu
+#     documentée pour l'alpha. SDDM est le standard maîtrisé : thème
+#     OPALE + autologin de test (VM uniquement). Le greeter natif
+#     plasmalogin restera pour la version finale (doc 04).
+RUN dnf -y install sddm sddm-kcm \
+    && SYSTEMD_OFFLINE=1 systemctl enable sddm.service \
+    && ln -sf /usr/lib/systemd/system/sddm.service \
+              /etc/systemd/system/display-manager.service \
+    && SYSTEMD_OFFLINE=1 systemctl set-default graphical.target \
+    && dnf clean all
+
+# --- 9bis. Thème SDDM OPALE + autologin de test (VM alpha uniquement) ---
+COPY branding/opale/sddm/hybridos-opale/ \
+     /usr/share/sddm/themes/hybridos-opale/
+COPY branding/opale/sddm/hybridos.conf /etc/sddm.conf.d/hybridos.conf
+COPY branding/opale/sddm/autologin.conf /etc/sddm.conf.d/autologin.conf
 
 # --- 10. First setup OPALE par utilisateur (Phase 2 — doc 07 §6) ---
 #     Applique automatiquement le look-and-feel OPALE (couleurs, wallpaper
