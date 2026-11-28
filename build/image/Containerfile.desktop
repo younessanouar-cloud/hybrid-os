@@ -76,9 +76,9 @@ COPY applications/showcase/hybrid-showcase.desktop \
 #     OPALE + autologin de test (VM uniquement). Le greeter natif
 #     plasmalogin restera pour la version finale (doc 04).
 RUN dnf -y install sddm sddm-kcm \
-    && SYSTEMD_OFFLINE=1 systemctl enable sddm.service \
     && ln -sf /usr/lib/systemd/system/sddm.service \
               /etc/systemd/system/display-manager.service \
+    && SYSTEMD_OFFLINE=1 systemctl enable sddm.service \
     && SYSTEMD_OFFLINE=1 systemctl set-default graphical.target \
     && dnf clean all
 
