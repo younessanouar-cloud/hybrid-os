@@ -50,7 +50,7 @@ Rectangle {
         }
     }
 
-    // Carte de connexion « verre »
+    // Carte de connexion « verre » (offset 110 : sous le titre HYBRID OS)
     Rectangle {
         id: carte
         width: 360; height: 230; radius: 14
@@ -59,7 +59,7 @@ Rectangle {
         border.color: "#3D7BFF"; border.width: 1
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: 60
+        anchors.verticalCenterOffset: 110
 
         Column {
             anchors.fill: parent

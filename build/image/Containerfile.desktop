@@ -30,6 +30,12 @@ FROM ${BASE_IMAGE}
 # --- 1. Localisation française ---
 RUN dnf -y install glibc-langpack-fr hunspell-fr \
     && dnf clean all
+# Locale/vconsole/fuseau par défaut de l'IMAGE (indépendant du kickstart —
+# Anaconda peut les écraser en mode text, le kickstart %overrides les remet)
+RUN echo "LANG=fr_FR.UTF-8" > /etc/locale.conf \
+    && echo "KEYMAP=fr" > /etc/vconsole.conf \
+    && echo "Europe/Paris" > /etc/timezone \
+    && ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
 
 # --- 2. Fond d'écran OPALE ---
 COPY branding/opale/opale-nuit-3840x2160.png \
