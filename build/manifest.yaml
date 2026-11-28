@@ -16,10 +16,11 @@ base:
   # Digest du manifest-list (multi-arch) au moment du figeage :
   #   - 2026-11-25 : sha256:79f701ea… (GC par quay le 26/11)
   #   - 2026-11-26 (rebase 1) : sha256:72c24fe7… (GC par quay le 27/11)
-  #   - 2026-11-27 (rebase 2) : sha256:2c82151153abf43075b7dd933d37d74cc1012a9960cf506950689ff8dd330cdb
-  digest: "sha256:2c82151153abf43075b7dd933d37d74cc1012a9960cf506950689ff8dd330cdb"
+  #   - 2026-11-27 (rebase 2) : sha256:2c821511… (GC quelques heures après)
+  #   - 2026-11-28 (rebase 3) : sha256:2056806eae5152bfb613798e9f41e98e8195b61a818d68fafd9bbcf13ef63cc4
+  digest: "sha256:2056806eae5152bfb613798e9f41e98e8195b61a818d68fafd9bbcf13ef63cc4"
   arch_target: x86_64        # cible v1 (doc 02) — aarch64 également publié par l'amont
-  verified_at: "2026-11-27"
+  verified_at: "2026-11-28"
   notes: >
     Fedora Kinoite = Atomic Desktop officiel KDE de Fedora, géré bootc
     (Image Mode). La CI construit TOUJOURS par digest (reproductibilité) ;
