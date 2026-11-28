@@ -225,6 +225,13 @@ if [ "${CAPTURE:-0}" = "1" ]; then
            -o UserKnownHostsFile=/dev/null -p 2222 hybride@127.0.0.1 \
            'echo dm=$(systemctl is-active display-manager 2>/dev/null) enabled=$(systemctl is-enabled display-manager 2>/dev/null) default=$(systemctl get-default 2>/dev/null); ls -la /etc/systemd/system/display-manager.service 2>&1 | head -1; rpm -q kde-settings-plasmalogin plasma-workspace 2>&1 | head -2' \
            2>/dev/null || echo "ssh-ko")
+    # v11 : QUI EST CONNECTÉ + journaux de TOUS les utilisateurs + état
+    # LookAndFeel lu par le système installé lui-même (faits, pas hypothèses)
+    DIAG11=$(sshpass -p hybrios01 ssh -o StrictHostKeyChecking=no \
+           -o UserKnownHostsFile=/dev/null -p 2222 hybride@127.0.0.1 \
+           'echo "homes: $(ls /home/ 2>/dev/null)"; echo "who: $(who 2>/dev/null)"; echo "lookandfeel-system: $(kreadconfig6 --file /etc/xdg/kdeglobals --group KDE --key LookAndFeelPackage 2>/dev/null)"; for u in /home/*/; do u="${u%/}"; u="${u##*/}"; echo "log[$u]: $(cat $u/.config/opale-firstsetup.log 2>/dev/null | tail -12)"; done; echo "autostart: $(ls /etc/xdg/autostart/ 2>/dev/null | grep -iE "welcome|hybrid")"' \
+           2>/dev/null || echo "lecture impossible")
+    echo "$DIAG11" | tail -40
     # Journal du first-setup OPALE (v10 : sortie NON masquée)
     FIRSTSETUP_LOG=$(sshpass -p hybrios01 ssh -o StrictHostKeyChecking=no \
            -o UserKnownHostsFile=/dev/null -p 2222 hybride@127.0.0.1 \

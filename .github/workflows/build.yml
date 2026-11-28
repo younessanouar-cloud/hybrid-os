@@ -117,6 +117,11 @@ jobs:
               podman run --rm "$IMG" test -f "$f" && echo "PRÉSENT" || echo "ABSENT"
             done
             echo ""
+            echo "--- Look-and-feel OPALE reconnu par Plasma ? ---"
+            podman run --rm "$IMG" bash -c \
+              'ls /usr/share/plasma/look-and-feel/ 2>&1; kreadconfig6 --file /etc/xdg/kdeglobals --group KDE --key LookAndFeelPackage 2>&1' \
+              2>&1 | head -8
+            echo ""
             echo "--- Inventaire rpm -qa (extrait, trié) ---"
             podman run --rm "$IMG" bash -c 'rpm -qa | sort | head -200'
             podman run --rm "$IMG" bash -c 'rpm -qa | sort | head -200'
